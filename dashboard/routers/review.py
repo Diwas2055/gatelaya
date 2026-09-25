@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import uuid
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException, Query, Response
@@ -143,7 +143,7 @@ async def label_decision(decision_id: str, body: LabelIn, session: SessionDep) -
                 label=body.label,
                 note=body.note,
                 text=body.text,
-                created_at=datetime.now(timezone.utc),
+                created_at=datetime.now(UTC),
             )
         )
         await session.commit()

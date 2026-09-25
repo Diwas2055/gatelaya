@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import lru_cache
 from typing import Any
 
 from sqlalchemy import Column, DateTime, MetaData, String, Table, Text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
-from gatelaya.audit import DecisionRecord, decision_metadata, guardrail_decisions
+from gatelaya.audit import DecisionRecord, decision_metadata
 
 from .settings import get_settings
 
@@ -31,8 +31,8 @@ review_labels = Table(
 def utc_dt(value: datetime) -> datetime:
     """Attach/convert to UTC — sqlite returns naive UTC wall times."""
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+        return value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
 
 
 def row_to_record(row: Mapping[str, Any]) -> DecisionRecord:

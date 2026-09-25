@@ -9,21 +9,20 @@ from __future__ import annotations
 import importlib.util
 import json
 from collections.abc import AsyncIterator
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 import httpx
 import pytest
 
-from gatelaya.audit import DecisionRecord, guardrail_decisions
-from gatelaya.config import GateLayaConfig
-
 from dashboard.db import get_engine, get_sessionmaker, init_db
 from dashboard.main import create_app
 from dashboard.settings import get_settings
+from gatelaya.audit import DecisionRecord, guardrail_decisions
+from gatelaya.config import GateLayaConfig
 
-NOW = datetime.now(timezone.utc)
+NOW = datetime.now(UTC)
 
 
 # ------------------------------------------------------------------ helpers

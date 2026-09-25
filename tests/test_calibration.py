@@ -11,7 +11,6 @@ from gatelaya.calibration import (
     TemperatureMap,
     calibrated,
     fit,
-    load_temperature_map,
     save_temperature_map,
 )
 from gatelaya.errors import GuardrailConfigurationError

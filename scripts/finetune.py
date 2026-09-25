@@ -224,8 +224,8 @@ def train_run(
     args: argparse.Namespace,
 ) -> dict[str, Any]:
     """Load base checkpoint, train with the official algorithm, save best. Returns log dict."""
-    import torch
     import laya
+    import torch
     from laya.common import proper_reward
 
     agent = laya.load(base, device=device)

@@ -21,7 +21,7 @@ class Settings(BaseModel):
     port: int = 8080
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         """Build settings from the environment (empty or unset means default)."""
 
         def env(name: str, default: object) -> object:

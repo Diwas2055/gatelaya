@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Sequence
+from collections.abc import Sequence
 
 from pydantic import BaseModel, ConfigDict
 
@@ -129,7 +129,7 @@ def _validate(probs: Sequence[float], labels: Sequence[int], n_bins: int) -> tup
     if n_bins < 1:
         raise ValueError(f"n_bins must be >= 1, got {n_bins}")
     clean_probs = [float(p) for p in probs]
-    clean_labels = [int(l) for l in labels]
+    clean_labels = [int(y) for y in labels]
     for p in clean_probs:
         if not 0.0 <= p <= 1.0:
             raise ValueError(f"probability out of [0, 1]: {p}")
@@ -145,9 +145,9 @@ def binary_metrics(
     """Score `prob >= threshold` against labels; precision/recall are 0.0 when undefined."""
     if not 0.0 <= threshold <= 1.0:
         raise ValueError(f"threshold must be in [0, 1], got {threshold}")
-    p, l = _validate(probs, labels, n_bins=1)
+    p, y = _validate(probs, labels, n_bins=1)
     tp = fp = tn = fn = 0
-    for prob, label in zip(p, l):
+    for prob, label in zip(p, y):
         predicted = prob >= threshold
         if predicted and label == 1:
             tp += 1
@@ -194,9 +194,9 @@ def sweep_thresholds(
 
     Best by accuracy → F1 → threshold closest to 0.5 → lowest threshold.
     """
-    p, l = _validate(probs, labels, n_bins=1)
+    p, y = _validate(probs, labels, n_bins=1)
     points = [
-        ThresholdPoint(threshold=threshold, metrics=binary_metrics(p, l, threshold))
+        ThresholdPoint(threshold=threshold, metrics=binary_metrics(p, y, threshold))
         for threshold in threshold_grid(step)
     ]
 
@@ -220,9 +220,9 @@ def roc_auc(probs: Sequence[float], labels: Sequence[int]) -> float:
     Perfect separation → 1.0, inverted → 0.0, random scoring → ~0.5.
     Raises ValueError when only one class is present (AUC undefined).
     """
-    p, l = _validate(probs, labels, n_bins=1)
-    positives = sum(l)
-    negatives = len(l) - positives
+    p, y = _validate(probs, labels, n_bins=1)
+    positives = sum(y)
+    negatives = len(y) - positives
     if positives == 0 or negatives == 0:
         raise ValueError(
             f"roc_auc needs both classes; got {positives} positive, {negatives} negative"
@@ -239,7 +239,7 @@ def roc_auc(probs: Sequence[float], labels: Sequence[int]) -> float:
         for k in range(i, j + 1):
             ranks[order[k]] = average_rank
         i = j + 1
-    rank_sum_positives = sum(rank for rank, label in zip(ranks, l) if label == 1)
+    rank_sum_positives = sum(rank for rank, label in zip(ranks, y) if label == 1)
     return (rank_sum_positives - positives * (positives + 1) / 2.0) / (
         positives * negatives
     )
@@ -262,11 +262,11 @@ def calibration_bins(
     probs: Sequence[float], labels: Sequence[int], n_bins: int = 10
 ) -> list[Bin]:
     """Summarize equal-width bins over [0,1] (left-closed, last bin includes 1.0)."""
-    p, l = _validate(probs, labels, n_bins)
+    p, y = _validate(probs, labels, n_bins)
     counts = [0] * n_bins
     conf_sums = [0.0] * n_bins
     pos_sums = [0] * n_bins
-    for prob, label in zip(p, l):
+    for prob, label in zip(p, y):
         idx = min(int(prob * n_bins), n_bins - 1)
         counts[idx] += 1
         conf_sums[idx] += prob
@@ -293,9 +293,9 @@ def ece(probs: Sequence[float], labels: Sequence[int], n_bins: int = 10) -> floa
     where B_m are the predictions with P(true) in bin m, mean_conf is their mean
     probability, and frac_positive is the fraction whose gold label is 1.
     """
-    p, l = _validate(probs, labels, n_bins)
+    p, y = _validate(probs, labels, n_bins)
     n = len(p)
-    return sum(bin_.n / n * bin_.gap for bin_ in calibration_bins(p, l, n_bins))
+    return sum(bin_.n / n * bin_.gap for bin_ in calibration_bins(p, y, n_bins))
 
 
 def _gate_target(gate: dict[str, float] | None) -> dict[str, float]:

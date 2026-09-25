@@ -18,9 +18,10 @@ final verdicts share one code path with `build_report`.
 from __future__ import annotations
 
 import random
+from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Sequence
+from datetime import UTC, datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -449,7 +450,7 @@ def run_tune(
             "n_bins": n_bins,
             "rows": sum(data.n for data in datas),
             "checks": [data.check for data in datas],
-            "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "created": datetime.now(UTC).isoformat(timespec="seconds"),
             **(meta or {}),
         },
         baseline=baseline,

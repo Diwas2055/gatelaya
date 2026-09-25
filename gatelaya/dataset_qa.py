@@ -21,7 +21,8 @@ from __future__ import annotations
 
 import random
 import re
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 CHECKS: tuple[str, ...] = ("pii", "injection", "toxicity", "secret_leak")
 

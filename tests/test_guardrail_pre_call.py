@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import pytest
-
 from gatelaya.audit import DecisionRecord, InMemoryAuditSink
 from gatelaya.calibration import TemperatureMap
 from gatelaya.config import GateLayaConfig

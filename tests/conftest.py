@@ -89,7 +89,7 @@ class FakeStreamResponse:
     def __init__(self, chunks: list[Any]) -> None:
         self.chunks = list(chunks)
 
-    def __aiter__(self) -> "FakeStreamResponse":
+    def __aiter__(self) -> FakeStreamResponse:
         self._index = 0
         return self
 

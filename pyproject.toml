@@ -27,7 +27,13 @@ gatelaya-dashboard = "dashboard.main:run"
 
 # uv: `uv sync` installs dev group by default; model/redis via --extra
 [dependency-groups]
-dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "aiosqlite",
+    "httpx",
+    "ruff>=0.16.9",
+]
 
 [tool.setuptools]
 packages = [
@@ -37,6 +43,14 @@ packages = [
     "dashboard",
     "dashboard.routers",
 ]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.ruff.lint]
+# Explicit set so CI is deterministic across ruff versions (0.16 expanded defaults)
+select = ["E4", "E7", "E9", "F", "W", "I", "UP"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

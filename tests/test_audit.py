@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pytest
@@ -46,7 +46,7 @@ def test_decision_record_defaults() -> None:
     assert rec.id
     assert len(rec.id) == 32  # uuid4 hex
     assert rec.timestamp.tzinfo is not None
-    assert rec.timestamp <= datetime.now(timezone.utc)
+    assert rec.timestamp <= datetime.now(UTC)
 
 
 def test_decision_record_model_dump_is_serializable() -> None:

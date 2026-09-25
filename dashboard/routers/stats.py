@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
@@ -51,7 +51,7 @@ async def _group_counts(
 @router.get("/stats", response_model=StatsOut)
 async def stats(session: SessionDep, hours: int = Query(24, ge=1, le=8760)) -> StatsOut:
     """Summarize decisions recorded in the last `hours` hours."""
-    cutoff = utc_dt(datetime.now(timezone.utc) - timedelta(hours=hours))
+    cutoff = utc_dt(datetime.now(UTC) - timedelta(hours=hours))
     window = guardrail_decisions.c.timestamp >= cutoff
     row = (
         await session.execute(
