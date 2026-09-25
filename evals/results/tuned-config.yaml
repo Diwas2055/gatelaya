@@ -1,0 +1,23 @@
+thresholds:
+  pii: 0.35
+  injection: 0.55
+  toxicity: 0.35
+  secret_leak: 0.6
+actions:
+  pii: mask
+  injection: block
+  toxicity: block
+  secret_leak: block
+mode:
+- pre_call
+- post_call
+english_checkpoint: convaiinnovations/laya
+multilingual_checkpoint: convaiinnovations/laya-multilingual
+enabled_checks:
+- pii
+- injection
+- toxicity
+- secret_leak
+calibration_path: evals/results/tuned-calibration.json
+audit_enabled: true
+fail_open: true

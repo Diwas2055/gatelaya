@@ -54,6 +54,24 @@ Exit codes: `0` = ran and (if `--gate`) gate passed · `1` = gate failed · `2` 
 
 Options: `--check` (repeatable), `--lang`, `--limit` (max rows **per check**), `--config` (thresholds yaml), `--calibration` (temperature map), `--bins` (ECE bins, default 10), `--report` (JSON output path), `--agent {laya,fake}`.
 
+## Tuning (`--tune`)
+
+Leakage-free per-check calibration + threshold selection on the same 654 rows: one model pass, then 5-fold CV per check — temperature fit and threshold chosen (grid 0.05–0.95, accuracy → F1 → closest to 0.5) on the **train** fold, scored on the **val** fold. CV aggregate = honest estimate; final refit on all rows = deployable config, labeled optimistic.
+
+```bash
+# Real tuning run (one model pass)
+uv run scripts/eval.py --tune --report evals/results/tuned-baseline-check.json
+
+# Plumbing test without the model (SANITY MODE — NOT real results)
+uv run scripts/eval.py --tune --agent fake --limit 20
+```
+
+Options: `--tune` (enables the mode; `--calibration` is ignored with a note), `--folds` (5), `--grid-step` (0.05), `--seed` (42), `--tune-report`, `--tune-config`, `--tune-calibration` (see defaults in main README § Evaluation → Tuning).
+
+Artifacts: `evals/results/tuned.json` (report: `baseline` / `cv` / `final` / `deltas` / `roc_auc` / `honest_assessment`), `tuned-config.yaml` (`GateLayaConfig` with tuned thresholds), `tuned-calibration.json` (`TemperatureMap`, pooled `default` + per-check noul keys — guardrail reads the per-check entry), `tune.log`.
+
+Real result (2026-09-25): baseline macro 0.665 / 0.222 → CV **0.819 / 0.220** → final 0.833 / 0.187 against the 0.90 / 0.15 gate — **still FAIL**. Tuning helps (`pii` 0.485 → 0.861, `toxicity` 0.491 → 0.806 via thresholds like 0.35) but per-check ROC AUC 0.87–0.93 caps best-threshold accuracy at 0.807–0.865: the zero-shot ranking itself is the binding constraint, not calibration. Full numbers: `evals/results/tuned.json`.
+
 ## How to add rows
 
 1. Append a line to the relevant `.jsonl` file with all five fields and a fresh `{check}-{NNN}` id (ids must stay globally unique).

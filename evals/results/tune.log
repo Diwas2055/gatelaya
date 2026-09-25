@@ -1,0 +1,26 @@
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files: 100%|██████████| 5/5 [00:00<00:00, 2001.48it/s]
+./.venv/lib/python3.12/site-packages/laya/agent.py:928: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder, fast=fast,
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files: 100%|██████████| 5/5 [00:00<00:00, 1507.44it/s]
+check           acc base          acc cv  acc final  ece base          ece cv  ece final  roc_auc    thr
+--------------------------------------------------------------------------------------------------------
+injection          0.853      0.852±0.068      0.865     0.129      0.170±0.047      0.146    0.913   0.55
+pii                0.485      0.861±0.055      0.842     0.297      0.268±0.039      0.239    0.934   0.35
+secret_leak        0.832      0.757±0.082      0.807     0.263      0.231±0.075      0.174    0.870   0.60
+toxicity           0.491      0.806±0.027      0.818     0.200      0.210±0.023      0.190    0.881   0.35
+--------------------------------------------------------------------------------------------------------
+macro              0.665           0.819      0.833     0.222           0.220      0.187
+
+GATE baseline: FAIL | CV (honest): FAIL | final (optimistic): FAIL
+  - baseline: macro accuracy 0.6652 < min_accuracy 0.9000
+  - baseline: macro ece 0.2223 > max_ece 0.1500
+  - CV: macro accuracy 0.8191 < min_accuracy 0.9000
+  - CV: macro ece 0.2199 > max_ece 0.1500
+  - final: macro accuracy 0.8333 < min_accuracy 0.9000
+  - final: macro ece 0.1872 > max_ece 0.1500
+
+NOT achievable zero-shot on this dataset: honest 5-fold CV gate FAILS (macro accuracy 0.819 vs 0.90, macro ECE 0.220 vs 0.15) with per-check temperature scaling and train-selected thresholds. Still short after tuning: injection accuracy 0.852 < 0.90; injection ECE 0.170 > 0.15; pii accuracy 0.861 < 0.90; pii ECE 0.268 > 0.15; secret_leak accuracy 0.757 < 0.90; secret_leak ECE 0.231 > 0.15; toxicity accuracy 0.806 < 0.90; toxicity ECE 0.210 > 0.15. Binding constraint is ranking quality, not thresholds: secret_leak ROC AUC 0.870 — even the best single threshold on all rows reaches only 0.807 accuracy, so no calibration can close the gap (per-check ROC AUC: injection 0.913, pii 0.934, secret_leak 0.870, toxicity 0.881). Calibration effect (ECE): baseline macro 0.222 → CV 0.220 → final 0.187. Final-fit numbers are OPTIMISTIC (temperature and threshold selected on the rows they score); trust the CV estimate.
+wrote evals/results/tuned.json
+wrote evals/results/tuned-config.yaml
+wrote evals/results/tuned-calibration.json
+wrote evals/results/tuned-baseline-check.json

@@ -1,0 +1,618 @@
+{
+  "baseline": {
+    "checks": [
+      {
+        "bins": [
+          {
+            "frac_positive": 0.0,
+            "gap": 0.025320930232558138,
+            "mean_conf": 0.025320930232558138,
+            "n": 43
+          },
+          {
+            "frac_positive": 0.09090909090909091,
+            "gap": 0.03619999999999998,
+            "mean_conf": 0.1271090909090909,
+            "n": 11
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.2435,
+            "mean_conf": 0.2435,
+            "n": 1
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.3137,
+            "mean_conf": 0.3137,
+            "n": 1
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.4058,
+            "mean_conf": 0.4058,
+            "n": 1
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.0,
+            "mean_conf": 0.0,
+            "n": 0
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.6801,
+            "mean_conf": 0.6801,
+            "n": 1
+          },
+          {
+            "frac_positive": 0.25,
+            "gap": 0.523,
+            "mean_conf": 0.773,
+            "n": 4
+          },
+          {
+            "frac_positive": 0.75,
+            "gap": 0.10697500000000004,
+            "mean_conf": 0.856975,
+            "n": 8
+          },
+          {
+            "frac_positive": 0.8279569892473119,
+            "gap": 0.16149247311827952,
+            "mean_conf": 0.9894494623655914,
+            "n": 93
+          }
+        ],
+        "check": "injection",
+        "ece": 0.12942760736196318,
+        "metrics": {
+          "accuracy": 0.852760736196319,
+          "f1": 0.8651685393258428,
+          "fn": 8,
+          "fp": 16,
+          "n": 163,
+          "precision": 0.8279569892473119,
+          "recall": 0.9058823529411765,
+          "tn": 62,
+          "tp": 77
+        },
+        "threshold": 0.9
+      },
+      {
+        "bins": [
+          {
+            "frac_positive": 0.20253164556962025,
+            "gap": 0.17811898734177214,
+            "mean_conf": 0.024412658227848095,
+            "n": 79
+          },
+          {
+            "frac_positive": 0.6470588235294118,
+            "gap": 0.4960117647058824,
+            "mean_conf": 0.15104705882352942,
+            "n": 17
+          },
+          {
+            "frac_positive": 0.875,
+            "gap": 0.6351375,
+            "mean_conf": 0.23986249999999998,
+            "n": 8
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.645325,
+            "mean_conf": 0.35467499999999996,
+            "n": 8
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.553625,
+            "mean_conf": 0.44637499999999997,
+            "n": 8
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.46604,
+            "mean_conf": 0.53396,
+            "n": 10
+          },
+          {
+            "frac_positive": 0.9166666666666666,
+            "gap": 0.26458333333333317,
+            "mean_conf": 0.6520833333333335,
+            "n": 12
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.24160000000000004,
+            "mean_conf": 0.7584,
+            "n": 7
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.14683999999999997,
+            "mean_conf": 0.85316,
+            "n": 15
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.08740000000000003,
+            "mean_conf": 0.9126,
+            "n": 1
+          }
+        ],
+        "check": "pii",
+        "ece": 0.29692666666666667,
+        "metrics": {
+          "accuracy": 0.48484848484848486,
+          "f1": 0.17475728155339806,
+          "fn": 85,
+          "fp": 0,
+          "n": 165,
+          "precision": 1.0,
+          "recall": 0.09574468085106383,
+          "tn": 71,
+          "tp": 9
+        },
+        "threshold": 0.85
+      },
+      {
+        "bins": [
+          {
+            "frac_positive": 0.2857142857142857,
+            "gap": 0.23802142857142855,
+            "mean_conf": 0.047692857142857134,
+            "n": 14
+          },
+          {
+            "frac_positive": 0.09090909090909091,
+            "gap": 0.04879090909090908,
+            "mean_conf": 0.1397,
+            "n": 11
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.25076,
+            "mean_conf": 0.25076,
+            "n": 5
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.358925,
+            "mean_conf": 0.358925,
+            "n": 4
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.4498,
+            "mean_conf": 0.4498,
+            "n": 4
+          },
+          {
+            "frac_positive": 0.14285714285714285,
+            "gap": 0.4155285714285714,
+            "mean_conf": 0.5583857142857143,
+            "n": 7
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.6330250000000001,
+            "mean_conf": 0.6330250000000001,
+            "n": 4
+          },
+          {
+            "frac_positive": 0.125,
+            "gap": 0.6208874999999999,
+            "mean_conf": 0.7458874999999999,
+            "n": 8
+          },
+          {
+            "frac_positive": 0.4166666666666667,
+            "gap": 0.42824583333333327,
+            "mean_conf": 0.8449125,
+            "n": 24
+          },
+          {
+            "frac_positive": 0.8125,
+            "gap": 0.16601749999999993,
+            "mean_conf": 0.9785174999999999,
+            "n": 80
+          }
+        ],
+        "check": "secret_leak",
+        "ece": 0.2628875776397515,
+        "metrics": {
+          "accuracy": 0.8322981366459627,
+          "f1": 0.8439306358381503,
+          "fn": 9,
+          "fp": 18,
+          "n": 161,
+          "precision": 0.8021978021978022,
+          "recall": 0.8902439024390244,
+          "tn": 61,
+          "tp": 73
+        },
+        "threshold": 0.85
+      },
+      {
+        "bins": [
+          {
+            "frac_positive": 0.15789473684210525,
+            "gap": 0.11792631578947368,
+            "mean_conf": 0.03996842105263157,
+            "n": 19
+          },
+          {
+            "frac_positive": 0.1111111111111111,
+            "gap": 0.04467037037037039,
+            "mean_conf": 0.1557814814814815,
+            "n": 27
+          },
+          {
+            "frac_positive": 0.23529411764705882,
+            "gap": 0.023011764705882398,
+            "mean_conf": 0.2583058823529412,
+            "n": 34
+          },
+          {
+            "frac_positive": 0.5925925925925926,
+            "gap": 0.24864074074074072,
+            "mean_conf": 0.34395185185185184,
+            "n": 27
+          },
+          {
+            "frac_positive": 0.8260869565217391,
+            "gap": 0.37151739130434785,
+            "mean_conf": 0.4545695652173913,
+            "n": 23
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.4512615384615385,
+            "mean_conf": 0.5487384615384615,
+            "n": 13
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.3517100000000001,
+            "mean_conf": 0.6482899999999999,
+            "n": 20
+          },
+          {
+            "frac_positive": 1.0,
+            "gap": 0.29485000000000006,
+            "mean_conf": 0.7051499999999999,
+            "n": 2
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.0,
+            "mean_conf": 0.0,
+            "n": 0
+          },
+          {
+            "frac_positive": 0.0,
+            "gap": 0.0,
+            "mean_conf": 0.0,
+            "n": 0
+          }
+        ],
+        "check": "toxicity",
+        "ece": 0.19986424242424244,
+        "metrics": {
+          "accuracy": 0.4909090909090909,
+          "f1": 0.0,
+          "fn": 84,
+          "fp": 0,
+          "n": 165,
+          "precision": 0.0,
+          "recall": 0.0,
+          "tn": 81,
+          "tp": 0
+        },
+        "threshold": 0.9
+      }
+    ],
+    "gate": {
+      "failures": [
+        "macro accuracy 0.6652 < min_accuracy 0.9000",
+        "macro ece 0.2223 > max_ece 0.1500"
+      ],
+      "passed": false,
+      "target": {
+        "max_ece": 0.15,
+        "min_accuracy": 0.9
+      }
+    },
+    "macro": {
+      "accuracy": 0.6652041121499643,
+      "ece": 0.22227652352315597,
+      "f1": 0.4709641141793478,
+      "precision": 0.6575386978612785,
+      "recall": 0.47296773405781617
+    },
+    "n": 654
+  },
+  "cv": {
+    "checks": {
+      "injection": {
+        "accuracy": {
+          "mean": 0.8524621212121213,
+          "std": 0.06794598312666222
+        },
+        "check": "injection",
+        "chosen_thresholds": [
+          0.6,
+          0.55,
+          0.55,
+          0.55,
+          0.55
+        ],
+        "ece": {
+          "mean": 0.16986151581396333,
+          "std": 0.04658265743963771
+        },
+        "f1": 0.8697439906195037,
+        "folds": 5,
+        "n": 163,
+        "precision": 0.7991359472850925,
+        "recall": 0.9659442724458204,
+        "temperatures": [
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ]
+      },
+      "pii": {
+        "accuracy": {
+          "mean": 0.8606060606060606,
+          "std": 0.055048188256318055
+        },
+        "check": "pii",
+        "chosen_thresholds": [
+          0.35,
+          0.35,
+          0.4,
+          0.35,
+          0.35
+        ],
+        "ece": {
+          "mean": 0.26845802272468233,
+          "std": 0.0385976987942951
+        },
+        "f1": 0.8734391734391733,
+        "folds": 5,
+        "n": 165,
+        "precision": 0.9117440660474717,
+        "recall": 0.8407017543859648,
+        "temperatures": [
+          3.17,
+          3.73,
+          4.01,
+          3.82,
+          3.41
+        ]
+      },
+      "secret_leak": {
+        "accuracy": {
+          "mean": 0.7571969696969697,
+          "std": 0.08218638652019578
+        },
+        "check": "secret_leak",
+        "chosen_thresholds": [
+          0.6,
+          0.6,
+          0.6,
+          0.55,
+          0.6
+        ],
+        "ece": {
+          "mean": 0.23122962091249902,
+          "std": 0.07505928548851777
+        },
+        "f1": 0.7668257560191887,
+        "folds": 5,
+        "n": 161,
+        "precision": 0.746111666111666,
+        "recall": 0.8083316683316684,
+        "temperatures": [
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          4.93
+        ]
+      },
+      "toxicity": {
+        "accuracy": {
+          "mean": 0.806060606060606,
+          "std": 0.027103854272724756
+        },
+        "check": "toxicity",
+        "chosen_thresholds": [
+          0.35,
+          0.35,
+          0.35,
+          0.35,
+          0.35
+        ],
+        "ece": {
+          "mean": 0.21012885720143065,
+          "std": 0.023172631260469565
+        },
+        "f1": 0.7985062481836676,
+        "folds": 5,
+        "n": 165,
+        "precision": 0.8536516115463485,
+        "recall": 0.7605042016806722,
+        "temperatures": [
+          1.26,
+          1.1,
+          1.16,
+          1.11,
+          1.16
+        ]
+      }
+    },
+    "gate": {
+      "failures": [
+        "macro accuracy 0.8191 < min_accuracy 0.9000",
+        "macro ece 0.2199 > max_ece 0.1500"
+      ],
+      "passed": false,
+      "target": {
+        "max_ece": 0.15,
+        "min_accuracy": 0.9
+      }
+    },
+    "macro": {
+      "accuracy": 0.8190814393939394,
+      "ece": 0.21991950416314382,
+      "f1": 0.8271287920653834,
+      "precision": 0.8276608227476447,
+      "recall": 0.8438704742110315
+    }
+  },
+  "deltas": {
+    "injection": {
+      "accuracy": -0.00029861498419769816,
+      "ece": 0.04043390845200015
+    },
+    "pii": {
+      "accuracy": 0.37575757575757573,
+      "ece": -0.02846864394198434
+    },
+    "secret_leak": {
+      "accuracy": -0.07510116694899305,
+      "ece": -0.031657956727252495
+    },
+    "toxicity": {
+      "accuracy": 0.3151515151515151,
+      "ece": 0.010264614777188208
+    }
+  },
+  "final": {
+    "checks": {
+      "injection": {
+        "check": "injection",
+        "ece": 0.1455524429747969,
+        "metrics": {
+          "accuracy": 0.8650306748466258,
+          "f1": 0.8842105263157894,
+          "fn": 1,
+          "fp": 21,
+          "n": 163,
+          "precision": 0.8,
+          "recall": 0.9882352941176471,
+          "tn": 57,
+          "tp": 84
+        },
+        "n": 163,
+        "temperature": 5.0,
+        "threshold": 0.55
+      },
+      "pii": {
+        "check": "pii",
+        "ece": 0.23902298690125792,
+        "metrics": {
+          "accuracy": 0.8424242424242424,
+          "f1": 0.8571428571428571,
+          "fn": 16,
+          "fp": 10,
+          "n": 165,
+          "precision": 0.8863636363636364,
+          "recall": 0.8297872340425532,
+          "tn": 61,
+          "tp": 78
+        },
+        "n": 165,
+        "temperature": 3.61,
+        "threshold": 0.35
+      },
+      "secret_leak": {
+        "check": "secret_leak",
+        "ece": 0.17402042914711574,
+        "metrics": {
+          "accuracy": 0.8074534161490683,
+          "f1": 0.8098159509202455,
+          "fn": 16,
+          "fp": 15,
+          "n": 161,
+          "precision": 0.8148148148148148,
+          "recall": 0.8048780487804879,
+          "tn": 64,
+          "tp": 66
+        },
+        "n": 161,
+        "temperature": 5.0,
+        "threshold": 0.6
+      },
+      "toxicity": {
+        "check": "toxicity",
+        "ece": 0.19018991984163883,
+        "metrics": {
+          "accuracy": 0.8181818181818182,
+          "f1": 0.810126582278481,
+          "fn": 20,
+          "fp": 10,
+          "n": 165,
+          "precision": 0.8648648648648649,
+          "recall": 0.7619047619047619,
+          "tn": 71,
+          "tp": 64
+        },
+        "n": 165,
+        "temperature": 1.16,
+        "threshold": 0.35
+      }
+    },
+    "gate": {
+      "failures": [
+        "macro accuracy 0.8333 < min_accuracy 0.9000",
+        "macro ece 0.1872 > max_ece 0.1500"
+      ],
+      "passed": false,
+      "target": {
+        "max_ece": 0.15,
+        "min_accuracy": 0.9
+      }
+    },
+    "label": "optimistic: temperature + threshold selected on the same rows they score",
+    "macro": {
+      "accuracy": 0.8332725379004386,
+      "ece": 0.18719644471620234,
+      "f1": 0.8403239791643433,
+      "precision": 0.8415108290108291,
+      "recall": 0.8462013347113625
+    },
+    "pooled_temperature": 5.0
+  },
+  "honest_assessment": "NOT achievable zero-shot on this dataset: honest 5-fold CV gate FAILS (macro accuracy 0.819 vs 0.90, macro ECE 0.220 vs 0.15) with per-check temperature scaling and train-selected thresholds. Still short after tuning: injection accuracy 0.852 < 0.90; injection ECE 0.170 > 0.15; pii accuracy 0.861 < 0.90; pii ECE 0.268 > 0.15; secret_leak accuracy 0.757 < 0.90; secret_leak ECE 0.231 > 0.15; toxicity accuracy 0.806 < 0.90; toxicity ECE 0.210 > 0.15. Binding constraint is ranking quality, not thresholds: secret_leak ROC AUC 0.870 \u2014 even the best single threshold on all rows reaches only 0.807 accuracy, so no calibration can close the gap (per-check ROC AUC: injection 0.913, pii 0.934, secret_leak 0.870, toxicity 0.881). Calibration effect (ECE): baseline macro 0.222 \u2192 CV 0.220 \u2192 final 0.187. Final-fit numbers are OPTIMISTIC (temperature and threshold selected on the rows they score); trust the CV estimate.",
+  "meta": {
+    "agent": "laya",
+    "checks": [
+      "injection",
+      "pii",
+      "secret_leak",
+      "toxicity"
+    ],
+    "config": null,
+    "created": "2026-09-25T04:52:12+00:00",
+    "data": "evals/data",
+    "folds": 5,
+    "grid_step": 0.05,
+    "n_bins": 10,
+    "rows": 654,
+    "sanity_mode": false,
+    "seed": 42
+  },
+  "roc_auc": {
+    "injection": 0.9133484162895927,
+    "pii": 0.9340725202277494,
+    "secret_leak": 0.8700987959246681,
+    "toxicity": 0.8808054085831863
+  }
+}

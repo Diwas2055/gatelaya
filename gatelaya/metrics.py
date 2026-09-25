@@ -1,7 +1,8 @@
-"""Eval metrics: binary scores, calibration error, and PRODUCT.md gate reports."""
+"""Eval metrics: binary scores, calibration error, sweeps, ROC AUC, and gate reports."""
 
 from __future__ import annotations
 
+import math
 from typing import Sequence
 
 from pydantic import BaseModel, ConfigDict
@@ -72,6 +73,30 @@ class MacroAverages(BaseModel):
     recall: float
     f1: float
     ece: float
+
+
+class ThresholdPoint(BaseModel):
+    """Metrics at one threshold of a sweep grid."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    threshold: float
+    metrics: BinaryMetrics
+
+
+class SweepResult(BaseModel):
+    """Per-threshold metrics over a grid plus the best pick.
+
+    Best pick: highest accuracy, then highest F1, then threshold closest to 0.5,
+    then lowest threshold (final deterministic tie-break, favors recall).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    step: float
+    points: list[ThresholdPoint]
+    best_threshold: float
+    best: BinaryMetrics
 
 
 class GateSection(BaseModel):
@@ -149,6 +174,90 @@ def binary_metrics(
     )
 
 
+def threshold_grid(step: float = 0.05) -> list[float]:
+    """Interior threshold grid (0, 1): k*step for k = 1 .. round(1/step) - 1.
+
+    Default step 0.05 → [0.05, 0.10, ..., 0.95].
+    """
+    if not 0.0 < step <= 1.0:
+        raise ValueError(f"step must be in (0, 1], got {step}")
+    count = int(round(1.0 / step))
+    if count < 2:
+        raise ValueError(f"step {step} is too coarse: no interior thresholds")
+    return [round(k * step, 10) for k in range(1, count)]
+
+
+def sweep_thresholds(
+    probs: Sequence[float], labels: Sequence[int], step: float = 0.05
+) -> SweepResult:
+    """Evaluate `binary_metrics` at every threshold on the grid; pick the best.
+
+    Best by accuracy → F1 → threshold closest to 0.5 → lowest threshold.
+    """
+    p, l = _validate(probs, labels, n_bins=1)
+    points = [
+        ThresholdPoint(threshold=threshold, metrics=binary_metrics(p, l, threshold))
+        for threshold in threshold_grid(step)
+    ]
+
+    def rank(point: ThresholdPoint) -> tuple[float, float, float, float]:
+        return (
+            point.metrics.accuracy,
+            point.metrics.f1,
+            -abs(point.threshold - 0.5),
+            -point.threshold,
+        )
+
+    best = max(points, key=rank)
+    return SweepResult(
+        step=step, points=points, best_threshold=best.threshold, best=best.metrics
+    )
+
+
+def roc_auc(probs: Sequence[float], labels: Sequence[int]) -> float:
+    """Rank-based ROC AUC (Mann-Whitney U with average ranks for ties).
+
+    Perfect separation → 1.0, inverted → 0.0, random scoring → ~0.5.
+    Raises ValueError when only one class is present (AUC undefined).
+    """
+    p, l = _validate(probs, labels, n_bins=1)
+    positives = sum(l)
+    negatives = len(l) - positives
+    if positives == 0 or negatives == 0:
+        raise ValueError(
+            f"roc_auc needs both classes; got {positives} positive, {negatives} negative"
+        )
+    order = sorted(range(len(p)), key=lambda i: p[i])
+    ranks = [0.0] * len(p)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and p[order[j + 1]] == p[order[i]]:
+            j += 1
+        # ranks i+1 .. j+1 (1-based) collapse to their average for ties
+        average_rank = (i + j) / 2.0 + 1.0
+        for k in range(i, j + 1):
+            ranks[order[k]] = average_rank
+        i = j + 1
+    rank_sum_positives = sum(rank for rank, label in zip(ranks, l) if label == 1)
+    return (rank_sum_positives - positives * (positives + 1) / 2.0) / (
+        positives * negatives
+    )
+
+
+def mean_std(values: Sequence[float]) -> tuple[float, float]:
+    """(mean, sample standard deviation); a single value has std 0.0."""
+    if not values:
+        raise ValueError("values must be non-empty")
+    vals = [float(v) for v in values]
+    count = len(vals)
+    mean = sum(vals) / count
+    if count == 1:
+        return mean, 0.0
+    variance = sum((v - mean) ** 2 for v in vals) / (count - 1)
+    return mean, math.sqrt(variance)
+
+
 def calibration_bins(
     probs: Sequence[float], labels: Sequence[int], n_bins: int = 10
 ) -> list[Bin]:
@@ -189,6 +298,37 @@ def ece(probs: Sequence[float], labels: Sequence[int], n_bins: int = 10) -> floa
     return sum(bin_.n / n * bin_.gap for bin_ in calibration_bins(p, l, n_bins))
 
 
+def _gate_target(gate: dict[str, float] | None) -> dict[str, float]:
+    """Resolve gate targets from overrides; raises on unknown keys."""
+    target: dict[str, float] = {"min_accuracy": MIN_ACCURACY, "max_ece": MAX_ECE}
+    if gate:
+        unknown = set(gate) - set(target)
+        if unknown:
+            raise ValueError(f"unknown gate keys: {sorted(unknown)}; allowed: {sorted(target)}")
+        target.update({key: float(value) for key, value in gate.items()})
+    return target
+
+
+def gate_verdict(
+    accuracy: float, ece_value: float, gate: dict[str, float] | None = None
+) -> GateSection:
+    """PASS/FAIL a (macro accuracy, macro ECE) pair against the gate targets.
+
+    Shared by `build_report` and the tuning CV aggregation so baseline, CV, and
+    final verdicts are produced by identical code. `gate` overrides
+    `min_accuracy`/`max_ece` (defaults: MIN_ACCURACY/MAX_ECE).
+    """
+    target = _gate_target(gate)
+    failures: list[str] = []
+    if accuracy < target["min_accuracy"]:
+        failures.append(
+            f"macro accuracy {accuracy:.4f} < min_accuracy {target['min_accuracy']:.4f}"
+        )
+    if ece_value > target["max_ece"]:
+        failures.append(f"macro ece {ece_value:.4f} > max_ece {target['max_ece']:.4f}")
+    return GateSection(target=target, passed=not failures, failures=failures)
+
+
 def build_report(
     results: Sequence[CheckResult],
     gate: dict[str, float] | None = None,
@@ -200,12 +340,7 @@ def build_report(
     """
     if not results:
         raise ValueError("build_report needs at least one CheckResult")
-    target: dict[str, float] = {"min_accuracy": MIN_ACCURACY, "max_ece": MAX_ECE}
-    if gate:
-        unknown = set(gate) - set(target)
-        if unknown:
-            raise ValueError(f"unknown gate keys: {sorted(unknown)}; allowed: {sorted(target)}")
-        target.update({key: float(value) for key, value in gate.items()})
+    _gate_target(gate)  # validate gate keys before touching probabilities
 
     checks: list[CheckEval] = []
     for result in results:
@@ -230,17 +365,9 @@ def build_report(
         ece=sum(c.ece for c in checks) / count,
     )
 
-    failures: list[str] = []
-    if macro.accuracy < target["min_accuracy"]:
-        failures.append(
-            f"macro accuracy {macro.accuracy:.4f} < min_accuracy {target['min_accuracy']:.4f}"
-        )
-    if macro.ece > target["max_ece"]:
-        failures.append(f"macro ece {macro.ece:.4f} > max_ece {target['max_ece']:.4f}")
-
     return EvalReport(
         checks=checks,
         macro=macro,
-        gate=GateSection(target=target, passed=not failures, failures=failures),
+        gate=gate_verdict(macro.accuracy, macro.ece, gate),
         n=sum(c.metrics.n for c in checks),
     )

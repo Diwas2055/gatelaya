@@ -28,6 +28,19 @@ class TemperatureMap:
             return float(self.choice.get(str(option_count), 1.0))
         raise GuardrailConfigurationError(f"unknown question type: {question_type!r}")
 
+    def noul_temperature(self, check: str | None = None) -> float:
+        """Temperature for a noul answer: per-check entry if present, else `default`.
+
+        Tuned calibration files store per-check temperatures as extra noul keys
+        (e.g. ``{"default": 1.3, "pii": 1.6}``); runtime looks up by check name
+        and falls back to `default`, so plain single-temperature files keep working.
+        """
+        if check is not None:
+            key = str(check)
+            if key in self.noul:
+                return float(self.noul[key])
+        return float(self.noul.get("default", 1.0))
+
     def to_dict(self) -> dict[str, dict[str, float]]:
         """Return the JSON-serializable map."""
         return {"choice": dict(self.choice), "noul": dict(self.noul)}

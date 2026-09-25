@@ -203,6 +203,12 @@ class GateLayaGuardrail(CustomGuardrail):
             return 1.0
         return self.temperatures.temperature_for(question_type, option_count)
 
+    def _noul_temperature(self, check: str) -> float:
+        """Temperature for a check's noul answer (per-check entry, else `default`)."""
+        if self.temperatures is None:
+            return 1.0
+        return self.temperatures.noul_temperature(check)
+
     async def _predict(
         self, text: str, checks: list[str]
     ) -> tuple[list[_Outcome] | None, float, Exception | None]:
@@ -239,7 +245,7 @@ class GateLayaGuardrail(CustomGuardrail):
             vector = [1.0, 0.0]
         else:
             vector = noul_probs(answer)
-        cal = calibrated(vector, self._temperature("noul"))
+        cal = calibrated(vector, self._noul_temperature(check))
         raw_p, cal_p = vector[1], cal[1]
         decision = "allow" if cal_p < threshold else configured
 

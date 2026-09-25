@@ -435,6 +435,38 @@ uv run scripts/eval.py --agent fake --limit 8   # SANITY MODE, not real results
 
 **GATE FAIL** — macro accuracy 0.665 < 0.90, macro ECE 0.222 > 0.15. PRODUCT.md scope (`pii` + `injection`, n=328): accuracy 0.669, ECE 0.213 → also fail. Notable: `toxicity` recall 0.0 (never fires at the default threshold), `pii` recall 0.096. This matches the documented zero-shot ceiling — run calibration (`scripts/calibrate.py`) on labeled traffic before judging the gate. Artifacts: `evals/results/first-run.json`, `evals/results/first-run-product-scope.json`.
 
+### Tuning
+
+`--tune` attacks the gate gap with **leakage-free** per-check temperature calibration + threshold selection. Each row is predicted **once** (single model pass), then per check: 5-fold CV fits a temperature (`gatelaya.calibration.fit`) and picks a threshold (grid 0.05–0.95 step 0.05, best accuracy → F1 → closest to 0.5) on the **train fold only**, and scores the **val fold** with those train-fit artifacts. The CV aggregate is the honest estimate; the final fit (temperature + threshold refit on all rows) is the deployable config and is labeled optimistic. `roc_auc` (rank-based, no sklearn) measures the ranking ceiling.
+
+```bash
+# Full tuning run — one model pass over 654 rows, then in-memory CV/final/baseline
+uv run scripts/eval.py --tune --report evals/results/tuned-baseline-check.json
+
+# Plumbing test without the model (SANITY MODE — NOT real results)
+uv run scripts/eval.py --tune --agent fake --limit 20
+
+# Options: --folds (5), --grid-step (0.05), --seed (42), --bins (10),
+#          --tune-report, --tune-config, --tune-calibration
+# With --gate, the exit code judges the honest CV metrics (not the final fit).
+```
+
+Artifacts (defaults): `evals/results/tuned.json` (full report: cv / final / baseline / deltas / roc_auc / honest_assessment), `evals/results/tuned-config.yaml` (`GateLayaConfig` with tuned thresholds + `calibration_path`), `evals/results/tuned-calibration.json` (`TemperatureMap`: pooled `default` + per-check noul entries — the guardrail picks the per-check temperature at runtime), `evals/results/tune.log`.
+
+**Tuned run** (laya 0.3.20, 2026-09-25, 5-fold CV, seed 42, step 0.05):
+
+| Check | Baseline acc | CV acc (mean±std) | Final acc | Baseline ECE | CV ECE | Final ECE | ROC AUC | Tuned thr |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| injection | 0.853 | 0.852 ± 0.068 | 0.865 | 0.129 | 0.170 ± 0.047 | 0.146 | 0.913 | 0.55 |
+| pii | 0.485 | 0.861 ± 0.055 | 0.842 | 0.297 | 0.268 ± 0.039 | 0.239 | 0.934 | 0.35 |
+| secret_leak | 0.832 | 0.757 ± 0.082 | 0.807 | 0.263 | 0.231 ± 0.075 | 0.174 | 0.870 | 0.60 |
+| toxicity | 0.491 | 0.806 ± 0.027 | 0.818 | 0.200 | 0.210 ± 0.023 | 0.190 | 0.881 | 0.35 |
+| **macro** | **0.665** | **0.819** | **0.833** | **0.222** | **0.220** | **0.187** | | |
+
+**Gates:** baseline **FAIL** · CV (honest) **FAIL** · final (optimistic) **FAIL** (all against 0.90 / 0.15).
+
+**Honest conclusion:** 0.90/0.15 is **not achievable zero-shot** on this dataset. Tuning recovers +0.15 macro accuracy (0.665 → 0.819 CV) — mainly by rescuing `pii` (0.485 → 0.861) and `toxicity` (0.491 → 0.806) recall with thresholds like 0.35 instead of 0.85–0.90 — but every check stays below 0.90 (best CV: `pii` 0.861) and macro ECE barely moves (0.222 → 0.220). The binding constraint is **ranking quality**: per-check ROC AUC is 0.87–0.93, and even the best single threshold on all rows reaches only 0.807–0.865 accuracy — no calibration or threshold can create separation the model doesn't produce zero-shot. The remaining lever is fine-tuning on labeled traffic (Roadmap), not more tuning against this eval set. Full numbers and the machine-generated verdict: `evals/results/tuned.json` → `honest_assessment`.
+
 ## Roadmap
 
 - **Phase 2 — model routing mode.** Use the same typed-decision layer to pick a model per request instead of only gating it.
