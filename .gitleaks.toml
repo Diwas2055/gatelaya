@@ -1,0 +1,12 @@
+# Gitleaks config — synthetic secret-leak FIXTURES are allowed.
+# GateLaya's secret_leak check is evaluated against fake keys by design
+# (evals/data, tests). Everything else in the repo must stay clean.
+
+[allowlist]
+paths = [
+  '''evals/data/.*''',
+  '''evals/results/.*''',
+  '''evals/reference/.*''',
+  '''tests/.*''',
+  '''graphify-out/.*''',
+]

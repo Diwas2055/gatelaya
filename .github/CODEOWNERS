@@ -1,0 +1,12 @@
+# Default owner for everything in this repo
+*       @Diwas2055
+
+# Stricter review for release/security surface
+.github/            @Diwas2055
+Dockerfile          @Diwas2055
+docker-compose.yml  @Diwas2055
+pyproject.toml      @Diwas2055
+uv.lock             @Diwas2055
+gatelaya/guardrail.py  @Diwas2055
+gatelaya/config.py     @Diwas2055
+SECURITY.md         @Diwas2055
