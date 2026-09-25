@@ -467,11 +467,38 @@ Artifacts (defaults): `evals/results/tuned.json` (full report: cv / final / base
 
 **Honest conclusion:** 0.90/0.15 is **not achievable zero-shot** on this dataset. Tuning recovers +0.15 macro accuracy (0.665 → 0.819 CV) — mainly by rescuing `pii` (0.485 → 0.861) and `toxicity` (0.491 → 0.806) recall with thresholds like 0.35 instead of 0.85–0.90 — but every check stays below 0.90 (best CV: `pii` 0.861) and macro ECE barely moves (0.222 → 0.220). The binding constraint is **ranking quality**: per-check ROC AUC is 0.87–0.93, and even the best single threshold on all rows reaches only 0.807–0.865 accuracy — no calibration or threshold can create separation the model doesn't produce zero-shot. The remaining lever is fine-tuning on labeled traffic (Roadmap), not more tuning against this eval set. Full numbers and the machine-generated verdict: `evals/results/tuned.json` → `honest_assessment`.
 
+### Fine-tuning
+
+The ranking ceiling above is exactly what fine-tuning attacks. `scripts/finetune.py` implements the official Laya RLCD recipe from `evals/reference/laya_finetune_official.ipynb` — proper-reward RLCD, eps-noise group sampling (group size 4), soft cross-entropy guidance, encoder/head 4× LR split, cosine schedule, gradient checkpointing — training **only the single noul question per row** with the production instruction from `gatelaya/questions.py`. Dataset QA and honest splits come from `scripts/prepare_data.py` (see [`evals/README.md`](evals/README.md) § Splits & QA).
+
+Honest protocol: train on `train.jsonl` (456 rows) only → best epoch picked by **val accuracy** (tie-break val loss) → per-check temperature fitted + thresholds swept **on val only** → evaluated **once on test** (99 rows).
+
+```bash
+uv sync --extra model                    # torch + safetensors arrive with laya
+uv run scripts/prepare_data.py           # QA report + deterministic splits
+uv run scripts/finetune.py --epochs 4 --out evals/models/gatelaya-ft
+uv run scripts/finetune_compare.py       # baseline vs finetuned on held-out test
+```
+
+**Result** (held-out test, n=99, 2026-09-25, single run, no sweeps):
+
+| Check | Base acc | FT acc | Base ECE | FT ECE | Base AUC | FT AUC |
+|---|---:|---:|---:|---:|---:|---:|
+| injection | 0.920 | 0.960 | 0.178 | 0.049 | 0.929 | 1.000 |
+| pii | 0.840 | 0.880 | 0.328 | 0.098 | 0.987 | 0.945 |
+| secret_leak | 0.833 | 0.833 | 0.151 | 0.158 | 0.924 | 0.851 |
+| toxicity | 0.800 | 0.960 | 0.219 | 0.040 | 0.974 | 0.955 |
+| **macro** | **0.848** | **0.908** | **0.219** | **0.086** | | |
+
+**Gates:** baseline **FAIL** (0.848 / 0.219) → finetuned **PASS** (0.908 / 0.086). PRODUCT.md scope (pii+injection): 0.92 acc / 0.074 ECE → PASS. Delta: **+0.060 macro accuracy, −0.133 macro ECE**. Artifacts: `evals/results/finetune-test.json`, `evals/results/finetune-log.json`; checkpoint `evals/models/gatelaya-ft` (gitignored).
+
+Deploy the fine-tuned checkpoint with `GATELAYA_MODEL_PATH=evals/models/gatelaya-ft` (single checkpoint serves both router buckets), `model_path:` in the config YAML, `eval.py --model evals/models/gatelaya-ft`, or `LayaRouterAgent(model_path=...)`. The saved checkpoint ships neutral temperatures (`[1.0, 1.0, 1.0]`) — fit calibration on deployment traffic as usual.
+
 ## Roadmap
 
 - **Phase 2 — model routing mode.** Use the same typed-decision layer to pick a model per request instead of only gating it.
 - **Phase 3 — FastAPI dashboard (Alpine.js + Tailwind).** Review queue for `flag` outcomes, threshold tuning UI, calibration upload, decision search over `guardrail_decisions`.
-- **Fine-tuning guide.** Documented extension: fine-tune Laya checkpoints on labeled traffic when zero-shot stops being enough; labels from the review queue feed both the tuning set and the next calibration run.
+- **Fine-tuning on production traffic.** ✅ Shipped: `scripts/finetune.py` + held-out splits close the gate (0.908 / 0.086). Next: feed review-queue labels into the next training round alongside `evals/data/`.
 - Later: Celery jobs for low-confidence review, per-key threshold config, streaming enforcement.
 
 ## License

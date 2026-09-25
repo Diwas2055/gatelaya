@@ -52,7 +52,7 @@ These targets, the schema, and the manifest counts are enforced by `tests/test_e
 
 Exit codes: `0` = ran and (if `--gate`) gate passed · `1` = gate failed · `2` = `laya` not installed.
 
-Options: `--check` (repeatable), `--lang`, `--limit` (max rows **per check**), `--config` (thresholds yaml), `--calibration` (temperature map), `--bins` (ECE bins, default 10), `--report` (JSON output path), `--agent {laya,fake}`.
+Options: `--check` (repeatable), `--lang`, `--limit` (max rows **per check**), `--config` (thresholds yaml), `--calibration` (temperature map), `--bins` (ECE bins, default 10), `--report` (JSON output path), `--agent {laya,fake}`, `--model` (single fine-tuned checkpoint for both router buckets).
 
 ## Tuning (`--tune`)
 
@@ -71,6 +71,19 @@ Options: `--tune` (enables the mode; `--calibration` is ignored with a note), `-
 Artifacts: `evals/results/tuned.json` (report: `baseline` / `cv` / `final` / `deltas` / `roc_auc` / `honest_assessment`), `tuned-config.yaml` (`GateLayaConfig` with tuned thresholds), `tuned-calibration.json` (`TemperatureMap`, pooled `default` + per-check noul keys — guardrail reads the per-check entry), `tune.log`.
 
 Real result (2026-09-25): baseline macro 0.665 / 0.222 → CV **0.819 / 0.220** → final 0.833 / 0.187 against the 0.90 / 0.15 gate — **still FAIL**. Tuning helps (`pii` 0.485 → 0.861, `toxicity` 0.491 → 0.806 via thresholds like 0.35) but per-check ROC AUC 0.87–0.93 caps best-threshold accuracy at 0.807–0.865: the zero-shot ranking itself is the binding constraint, not calibration. Full numbers: `evals/results/tuned.json`.
+
+## Splits & QA (`scripts/prepare_data.py`)
+
+Regenerable train/val/test splits plus a two-tier QA report — the foundation for honest fine-tuning:
+
+```bash
+uv run scripts/prepare_data.py   # writes evals/data/qa_report.json + evals/data/splits/
+uv run pytest tests/test_dataset_qa.py -q
+```
+
+- **Two-tier QA** (`gatelaya/dataset_qa.py`). *Strict* patterns (regex + exact phrases, multilingual) must produce **0 false positives on negatives** after placeholder/fixture blanking (reCAPTCHA `6LeIxAcT…` test secrets, `<...>` spans, `your-…`/`example`/`dummy` placeholders). *Marker* keywords (broader: devanagari, leet-speak, multilingual injection phrases) enforce positive coverage: `pii` ≥ 0.85, `injection`/`secret_leak` ≥ 0.90; `toxicity` has no reliable regex so coverage is unenforced. **Final: all checks pass, 0 mislabels.**
+- **Splits** (`evals/data/splits/`). Stratified by (check, label), ratios 70/15/15, seed 42, minimum **20 test rows per check** (borrowed round-robin from train, never emptying a group). Deterministic: same inputs → identical files. Actual: train 456 · val 99 · test 99; every row appears in exactly one split; every (check, label) in every split.
+- **Protocol rule.** Train only on `train.jsonl`; fit temperatures and sweep thresholds on `val.jsonl` only; evaluate `test.jsonl` exactly once (`scripts/finetune_compare.py`). Never tune against the test split.
 
 ## How to add rows
 

@@ -1,0 +1,756 @@
+{
+  "baseline": {
+    "temperatures": {
+      "default": 2.74,
+      "injection": 3.3,
+      "pii": 4.33,
+      "secret_leak": 1.91,
+      "toxicity": 0.57
+    },
+    "test_report": {
+      "checks": [
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.03984142878623716,
+              "mean_conf": 0.03984142878623716,
+              "n": 7
+            },
+            {
+              "frac_positive": 0.3333333333333333,
+              "gap": 0.17149450430845495,
+              "mean_conf": 0.16183882902487837,
+              "n": 6
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.7547196335332893,
+              "mean_conf": 0.24528036646671073,
+              "n": 1
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.6451995767189989,
+              "mean_conf": 0.3548004232810011,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.6666666666666666,
+              "gap": 0.1863589118986389,
+              "mean_conf": 0.48030775476802773,
+              "n": 3
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.4508093851449161,
+              "mean_conf": 0.5491906148550839,
+              "n": 1
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.3510857303261492,
+              "mean_conf": 0.6489142696738508,
+              "n": 3
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.26219704315667847,
+              "mean_conf": 0.7378029568433215,
+              "n": 2
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.17282453888876248,
+              "mean_conf": 0.8271754611112375,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            }
+          ],
+          "check": "toxicity",
+          "ece": 0.21872552698512313,
+          "metrics": {
+            "accuracy": 0.8,
+            "f1": 0.7826086956521738,
+            "fn": 4,
+            "fp": 1,
+            "n": 25,
+            "precision": 0.9,
+            "recall": 0.6923076923076923,
+            "tn": 11,
+            "tp": 9
+          },
+          "threshold": 0.4
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.00023095961534162407,
+              "mean_conf": 0.00023095961534162407,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.1265352171242389,
+              "mean_conf": 0.1265352171242389,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.24620191825582302,
+              "mean_conf": 0.24620191825582302,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.3486248254108666,
+              "mean_conf": 0.3486248254108666,
+              "n": 6
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.6666666666666666,
+              "gap": 0.040526568567470056,
+              "mean_conf": 0.6261400980991966,
+              "n": 3
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.26652161795409635,
+              "mean_conf": 0.7334783820459037,
+              "n": 1
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.17396263035529924,
+              "mean_conf": 0.8260373696447008,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.8888888888888888,
+              "gap": 0.11088015149576935,
+              "mean_conf": 0.9997690403846582,
+              "n": 9
+            }
+          ],
+          "check": "injection",
+          "ece": 0.17779467654181821,
+          "metrics": {
+            "accuracy": 0.92,
+            "f1": 0.9285714285714286,
+            "fn": 0,
+            "fp": 2,
+            "n": 25,
+            "precision": 0.8666666666666667,
+            "recall": 1.0,
+            "tn": 10,
+            "tp": 13
+          },
+          "threshold": 0.6
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.1654553792494433,
+              "mean_conf": 0.1654553792494433,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.24649275493288975,
+              "mean_conf": 0.24649275493288975,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.3204936238654241,
+              "mean_conf": 0.3204936238654241,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.4675617268365974,
+              "mean_conf": 0.4675617268365974,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.5,
+              "gap": 0.04937699426550135,
+              "mean_conf": 0.5493769942655014,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.5,
+              "gap": 0.1871558874151995,
+              "mean_conf": 0.6871558874151995,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.75,
+              "gap": 0.004130336801415724,
+              "mean_conf": 0.7541303368014157,
+              "n": 4
+            },
+            {
+              "frac_positive": 0.5,
+              "gap": 0.3539155469474715,
+              "mean_conf": 0.8539155469474715,
+              "n": 2
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.005179875998355676,
+              "mean_conf": 0.9948201240016443,
+              "n": 6
+            }
+          ],
+          "check": "secret_leak",
+          "ece": 0.15118768459253545,
+          "metrics": {
+            "accuracy": 0.8333333333333334,
+            "f1": 0.8333333333333334,
+            "fn": 2,
+            "fp": 2,
+            "n": 24,
+            "precision": 0.8333333333333334,
+            "recall": 0.8333333333333334,
+            "tn": 10,
+            "tp": 10
+          },
+          "threshold": 0.7
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0016900626636883619,
+              "mean_conf": 0.0016900626636883619,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.12608885722940164,
+              "mean_conf": 0.12608885722940164,
+              "n": 3
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.125,
+              "gap": 0.2265367452472865,
+              "mean_conf": 0.3515367452472865,
+              "n": 8
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.5437983672780549,
+              "mean_conf": 0.45620163272194514,
+              "n": 4
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.45045570338818386,
+              "mean_conf": 0.5495442966118161,
+              "n": 6
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.37956067272658567,
+              "mean_conf": 0.6204393272734143,
+              "n": 3
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            }
+          ],
+          "check": "pii",
+          "ece": 0.32835441215805056,
+          "metrics": {
+            "accuracy": 0.84,
+            "f1": 0.8750000000000001,
+            "fn": 0,
+            "fp": 4,
+            "n": 25,
+            "precision": 0.7777777777777778,
+            "recall": 1.0,
+            "tn": 7,
+            "tp": 14
+          },
+          "threshold": 0.35
+        }
+      ],
+      "gate": {
+        "failures": [
+          "macro accuracy 0.8483 < min_accuracy 0.9000",
+          "macro ece 0.2190 > max_ece 0.1500"
+        ],
+        "passed": false,
+        "target": {
+          "max_ece": 0.15,
+          "min_accuracy": 0.9
+        }
+      },
+      "macro": {
+        "accuracy": 0.8483333333333334,
+        "ece": 0.21901557506938185,
+        "f1": 0.8548783643892339,
+        "precision": 0.8444444444444444,
+        "recall": 0.8814102564102564
+      },
+      "n": 99
+    },
+    "test_roc_auc": {
+      "injection": 0.9295,
+      "pii": 0.987,
+      "secret_leak": 0.9236,
+      "toxicity": 0.9744
+    },
+    "thresholds": {
+      "injection": 0.6,
+      "pii": 0.35,
+      "secret_leak": 0.7,
+      "toxicity": 0.4
+    },
+    "val": {
+      "injection": {
+        "n": 25,
+        "pos": 13
+      },
+      "pii": {
+        "n": 25,
+        "pos": 14
+      },
+      "secret_leak": {
+        "n": 24,
+        "pos": 12
+      },
+      "toxicity": {
+        "n": 25,
+        "pos": 13
+      }
+    }
+  },
+  "delta": {
+    "baseline_gate_passed": false,
+    "finetuned_gate_passed": true,
+    "macro_accuracy": 0.06,
+    "macro_ece": -0.1327
+  },
+  "finetuned": {
+    "temperatures": {
+      "default": 5.0,
+      "injection": 5.0,
+      "pii": 5.0,
+      "secret_leak": 5.0,
+      "toxicity": 0.83
+    },
+    "test_report": {
+      "checks": [
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 3.4847263129172364e-15,
+              "mean_conf": 3.4847263129172364e-15,
+              "n": 11
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.9285714285714286,
+              "gap": 0.07141327243963858,
+              "mean_conf": 0.9999847010110672,
+              "n": 14
+            }
+          ],
+          "check": "toxicity",
+          "ece": 0.03999143256619914,
+          "metrics": {
+            "accuracy": 0.96,
+            "f1": 0.962962962962963,
+            "fn": 0,
+            "fp": 1,
+            "n": 25,
+            "precision": 0.9285714285714286,
+            "recall": 1.0,
+            "tn": 11,
+            "tp": 13
+          },
+          "threshold": 0.6
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0039652856191522,
+              "mean_conf": 0.0039652856191522,
+              "n": 11
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.1794496705529411,
+              "mean_conf": 0.1794496705529411,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.5791436809177681,
+              "mean_conf": 0.42085631908223187,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.3798687260277289,
+              "mean_conf": 0.6201312739722711,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.003965285619152326,
+              "mean_conf": 0.9960347143808477,
+              "n": 11
+            }
+          ],
+          "check": "injection",
+          "ece": 0.04902793444479152,
+          "metrics": {
+            "accuracy": 0.96,
+            "f1": 0.9600000000000001,
+            "fn": 1,
+            "fp": 0,
+            "n": 25,
+            "precision": 1.0,
+            "recall": 0.9230769230769231,
+            "tn": 12,
+            "tp": 12
+          },
+          "threshold": 0.5
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.125,
+              "gap": 0.1210347143808478,
+              "mean_conf": 0.0039652856191522,
+              "n": 8
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.136809250553743,
+              "mean_conf": 0.136809250553743,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.27347457989184126,
+              "mean_conf": 0.27347457989184126,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.5,
+              "gap": 0.1133767246628018,
+              "mean_conf": 0.3866232753371982,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 1.0,
+              "gap": 0.22890426058584545,
+              "mean_conf": 0.7710957394141545,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.8181818181818182,
+              "gap": 0.17785289619902944,
+              "mean_conf": 0.9960347143808477,
+              "n": 11
+            }
+          ],
+          "check": "secret_leak",
+          "ece": 0.1579417130663808,
+          "metrics": {
+            "accuracy": 0.8333333333333334,
+            "f1": 0.8333333333333334,
+            "fn": 2,
+            "fp": 2,
+            "n": 24,
+            "precision": 0.8333333333333334,
+            "recall": 0.8333333333333334,
+            "tn": 10,
+            "tp": 10
+          },
+          "threshold": 0.5
+        },
+        {
+          "bins": [
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0039652856191522,
+              "mean_conf": 0.0039652856191522,
+              "n": 8
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.0,
+              "mean_conf": 0.0,
+              "n": 0
+            },
+            {
+              "frac_positive": 0.0,
+              "gap": 0.7932858332905103,
+              "mean_conf": 0.7932858332905103,
+              "n": 1
+            },
+            {
+              "frac_positive": 0.5,
+              "gap": 0.3418705394466609,
+              "mean_conf": 0.8418705394466609,
+              "n": 2
+            },
+            {
+              "frac_positive": 0.9285714285714286,
+              "gap": 0.06746328580941907,
+              "mean_conf": 0.9960347143808477,
+              "n": 14
+            }
+          ],
+          "check": "pii",
+          "ece": 0.09812940793875667,
+          "metrics": {
+            "accuracy": 0.88,
+            "f1": 0.9032258064516129,
+            "fn": 0,
+            "fp": 3,
+            "n": 25,
+            "precision": 0.8235294117647058,
+            "recall": 1.0,
+            "tn": 8,
+            "tp": 14
+          },
+          "threshold": 0.65
+        }
+      ],
+      "gate": {
+        "failures": [],
+        "passed": true,
+        "target": {
+          "max_ece": 0.15,
+          "min_accuracy": 0.9
+        }
+      },
+      "macro": {
+        "accuracy": 0.9083333333333333,
+        "ece": 0.08627262200403203,
+        "f1": 0.9148805256869773,
+        "precision": 0.896358543417367,
+        "recall": 0.9391025641025641
+      },
+      "n": 99
+    },
+    "test_roc_auc": {
+      "injection": 1.0,
+      "pii": 0.9448,
+      "secret_leak": 0.8507,
+      "toxicity": 0.9551
+    },
+    "thresholds": {
+      "injection": 0.5,
+      "pii": 0.65,
+      "secret_leak": 0.5,
+      "toxicity": 0.6
+    },
+    "val": {
+      "injection": {
+        "n": 25,
+        "pos": 13
+      },
+      "pii": {
+        "n": 25,
+        "pos": 14
+      },
+      "secret_leak": {
+        "n": 24,
+        "pos": 12
+      },
+      "toxicity": {
+        "n": 25,
+        "pos": 13
+      }
+    }
+  },
+  "model": "./evals/models/gatelaya-ft",
+  "protocol": "temps+thresholds fit on val, evaluated once on test",
+  "test_rows": 99
+}

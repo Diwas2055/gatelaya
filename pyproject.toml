@@ -18,7 +18,8 @@ dependencies = [
 
 [project.optional-dependencies]
 redis = ["redis"]
-model = ["laya"]
+model = ["laya"]                 # inference; brings torch + safetensors
+train = ["laya", "torch", "safetensors"]  # fine-tuning (scripts/finetune.py)
 dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
 
 [project.scripts]

@@ -31,15 +31,21 @@ class LayaAgent(Protocol):
 
 
 class LayaRouterAgent:
-    """Loads english/multilingual Laya checkpoints lazily and routes by script."""
+    """Loads english/multilingual Laya checkpoints lazily and routes by script.
+
+    ``model_path`` overrides routing: one checkpoint (e.g. a fine-tune) serves
+    both buckets.
+    """
 
     def __init__(
         self,
         english_checkpoint: str = ENGLISH_CHECKPOINT,
         multilingual_checkpoint: str = MULTILINGUAL_CHECKPOINT,
+        model_path: str | None = None,
     ) -> None:
         self.english_checkpoint = english_checkpoint
         self.multilingual_checkpoint = multilingual_checkpoint
+        self.model_path = str(model_path) if model_path else None
         self._agents: dict[str, Any] = {}
         self._lock = threading.Lock()
 
@@ -57,14 +63,15 @@ class LayaRouterAgent:
 
     def _get_agent(self, bucket: Bucket) -> Any:
         with self._lock:
-            cached = self._agents.get(bucket)
+            key = "model_path" if self.model_path else bucket
+            cached = self._agents.get(key)
             if cached is not None:
                 return cached
-            checkpoint = (
+            checkpoint = self.model_path or (
                 self.english_checkpoint if bucket == "english" else self.multilingual_checkpoint
             )
             agent = self._laya().load(checkpoint)
-            self._agents[bucket] = agent
+            self._agents[key] = agent
             return agent
 
     def predict(self, state: dict, questions: dict) -> dict:

@@ -1,0 +1,60 @@
+{
+  "totals": {
+    "rows": 654,
+    "by_check": {
+      "pii": 165,
+      "injection": 163,
+      "toxicity": 165,
+      "secret_leak": 161
+    },
+    "positives": 345,
+    "negatives": 309
+  },
+  "per_check": {
+    "pii": {
+      "positives": 94,
+      "negatives": 71,
+      "strict_hits": 0,
+      "strict_hit_ids": [],
+      "rows_with_issues": [],
+      "marker_hits": 94,
+      "coverage": 1.0,
+      "threshold": 0.85,
+      "misses": []
+    },
+    "injection": {
+      "positives": 85,
+      "negatives": 78,
+      "strict_hits": 0,
+      "strict_hit_ids": [],
+      "rows_with_issues": [],
+      "marker_hits": 85,
+      "coverage": 1.0,
+      "threshold": 0.9,
+      "misses": []
+    },
+    "toxicity": {
+      "positives": 84,
+      "negatives": 81,
+      "strict_hits": 0,
+      "strict_hit_ids": [],
+      "rows_with_issues": [],
+      "marker_hits": null,
+      "coverage": null,
+      "threshold": null,
+      "misses": []
+    },
+    "secret_leak": {
+      "positives": 82,
+      "negatives": 79,
+      "strict_hits": 0,
+      "strict_hit_ids": [],
+      "rows_with_issues": [],
+      "marker_hits": 82,
+      "coverage": 1.0,
+      "threshold": 0.9,
+      "misses": []
+    }
+  },
+  "passed": true
+}

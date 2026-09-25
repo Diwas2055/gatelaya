@@ -45,6 +45,8 @@ class GateLayaConfig(BaseModel):
     mode: list[ModeName] = Field(default_factory=lambda: ["pre_call", "post_call"])
     english_checkpoint: str = DEFAULT_ENGLISH_CHECKPOINT
     multilingual_checkpoint: str = DEFAULT_MULTILINGUAL_CHECKPOINT
+    #: Single fine-tuned checkpoint used for BOTH router buckets (overrides routing).
+    model_path: Path | None = None
     enabled_checks: list[CheckName] = Field(
         default_factory=lambda: ["pii", "injection", "toxicity", "secret_leak"]
     )

@@ -137,6 +137,9 @@ def _env_overrides(config: GateLayaConfig) -> GateLayaConfig:
     raw_calibration = os.getenv("GATELAYA_CALIBRATION_PATH")
     if raw_calibration is not None:
         data["calibration_path"] = raw_calibration or None
+    raw_model = os.getenv("GATELAYA_MODEL_PATH")
+    if raw_model is not None:
+        data["model_path"] = raw_model or None
     return GateLayaConfig(**data)
 
 
@@ -174,6 +177,7 @@ class GateLayaGuardrail(CustomGuardrail):
             agent = LayaRouterAgent(
                 english_checkpoint=config.english_checkpoint,
                 multilingual_checkpoint=config.multilingual_checkpoint,
+                model_path=str(config.model_path) if config.model_path else None,
             )
         if audit is None:
             audit = SqlAlchemyAuditSink(audit_url) if audit_url else InMemoryAuditSink()

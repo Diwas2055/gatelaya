@@ -19,6 +19,7 @@ venv/
 calibration.json
 labeled.jsonl
 *.db
+evals/models/
 
 # OS
 .DS_Store

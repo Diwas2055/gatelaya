@@ -1,0 +1,54 @@
+{
+  "seed": 42,
+  "ratios": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "min_test_per_check": 20,
+  "source_files": [
+    "pii.jsonl",
+    "injection.jsonl",
+    "toxicity.jsonl",
+    "secret_leak.jsonl"
+  ],
+  "counts": {
+    "train": 456,
+    "val": 99,
+    "test": 99
+  },
+  "by_split_check": {
+    "train": {
+      "secret_leak": 113,
+      "pii": 115,
+      "injection": 113,
+      "toxicity": 115
+    },
+    "val": {
+      "secret_leak": 24,
+      "toxicity": 25,
+      "injection": 25,
+      "pii": 25
+    },
+    "test": {
+      "toxicity": 25,
+      "injection": 25,
+      "secret_leak": 24,
+      "pii": 25
+    }
+  },
+  "by_split_label": {
+    "train": {
+      "0": 215,
+      "1": 241
+    },
+    "val": {
+      "0": 47,
+      "1": 52
+    },
+    "test": {
+      "0": 47,
+      "1": 52
+    }
+  }
+}

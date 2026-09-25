@@ -57,7 +57,7 @@ The open, local, multilingual alternative to cloud moderation APIs for LLM gatew
 - No training — inference + calibration only
 
 ## Constraints
-- Laya base checkpoints are near-chance zero-shot for complex decisions → ship with narrow checks (binary/few-option) + calibration; fine-tune documented as extension
+- Laya base checkpoints are near-chance zero-shot for complex decisions → ship with narrow checks (binary/few-option) + calibration; fine-tune implemented (`scripts/finetune.py`, official RLCD recipe) for when zero-shot isn't enough
 - `choice` ≤ ~20 options per question
 - No ordinal `score` questions (position bias in multilingual checkpoint) — use ordered `choice`
 - Shipped model is uncalibrated → calibration script is a mandatory setup step, not optional
@@ -65,7 +65,7 @@ The open, local, multilingual alternative to cloud moderation APIs for LLM gatew
 
 ## Success Criteria
 - P95 guardrail overhead < 100ms per request (model forward ~33ms + hook overhead) — measurable now
-- Injection/PII block accuracy ≥ 0.90 and Mean ECE ≤ 0.15 — **not met**: labeled eval set (`evals/data/`, 654 rows) + `scripts/eval.py` shipped; real-model run 2026-09-25 (laya 0.3.20, zero-shot, uncalibrated): pii+injection macro accuracy 0.669, ECE 0.213 → **FAIL**. Tuned same day (`--tune`, leakage-free 5-fold CV, per-check temperature + thresholds): product scope accuracy 0.857, ECE 0.219 (all-checks macro 0.819 / 0.220) → **still FAIL**; per-check ROC AUC 0.87–0.93 caps best-threshold accuracy at 0.807–0.865, so calibration cannot close the gap — fine-tune on labeled traffic is the remaining lever
+- Injection/PII block accuracy ≥ 0.90 and Mean ECE ≤ 0.15 — **met by fine-tuning**: labeled eval set (`evals/data/`, 654 rows) + `scripts/eval.py` shipped; zero-shot run 2026-09-25 (laya 0.3.20): product scope accuracy 0.669, ECE 0.213 → **FAIL**; leakage-free 5-fold CV tuning: product scope 0.857 / 0.219 (all-checks 0.819 / 0.220) → **still FAIL**, per-check ROC AUC 0.87–0.93 caps calibration. **Fine-tuned 2026-09-25** (official RLCD recipe, honest held-out test, temps+thresholds fit on val only): product scope (pii+injection) accuracy **0.92**, ECE **0.074**; all-checks macro **0.908 / 0.086** → **PASS** (`evals/results/finetune-test.json`, baseline on same test split 0.848 / 0.219 → FAIL)
 - Drop-in: existing OpenAI client works unchanged against guarded LiteLLM endpoint — verified by integration tests
 - Full audit coverage: 100% of guarded requests logged with decision + probabilities — covered by unit tests
 

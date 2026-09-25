@@ -1,0 +1,76 @@
+{
+  "base": "convaiinnovations/laya-multilingual",
+  "device": "mps",
+  "hyperparameters": {
+    "epochs": 4,
+    "lr_encoder": 2e-05,
+    "lr_head": 8e-05,
+    "micro_batch": 8,
+    "grad_accum": 4,
+    "group_size": 4,
+    "w_sph": 0.75,
+    "weight_decay": 0.01,
+    "sigma": [
+      0.4,
+      0.1
+    ],
+    "clip_norm": 1.0,
+    "patience": 2,
+    "max_len": 1024,
+    "head_max_len": 256,
+    "seed": 42,
+    "temperature_saved": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "train_items": 456,
+  "val_items": 99,
+  "epochs_run": 4,
+  "best_epoch": 3,
+  "best_val_loss": 0.8395,
+  "best_val_accuracy": 0.9293,
+  "selection": "max val accuracy, tie-break min val loss",
+  "stopped_early": false,
+  "epoch_logs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5171,
+      "val_loss": 0.2642,
+      "val_accuracy": 0.8889,
+      "lr": 1.6830292490544043e-05,
+      "sigma": 0.4,
+      "seconds": 110.0
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.0891,
+      "val_loss": 0.2851,
+      "val_accuracy": 0.9192,
+      "lr": 9.43633747701858e-06,
+      "sigma": 0.3,
+      "seconds": 232.6
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.0557,
+      "val_loss": 0.8395,
+      "val_accuracy": 0.9293,
+      "lr": 2.7521717448870295e-06,
+      "sigma": 0.2,
+      "seconds": 340.4
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.1029,
+      "val_loss": 1.1815,
+      "val_accuracy": 0.9091,
+      "lr": 1.2381848342726742e-06,
+      "sigma": 0.1,
+      "seconds": 464.0
+    }
+  ],
+  "total_seconds": 464.0,
+  "output": "evals/models/gatelaya-ft"
+}

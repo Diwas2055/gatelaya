@@ -72,6 +72,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--agent", choices=("laya", "fake"), default="laya",
         help="predict with the real Laya model or a deterministic sanity stub",
     )
+    parser.add_argument(
+        "--model",
+        help="single checkpoint path used for both router buckets "
+        "(fine-tune override; default: routed base checkpoints)",
+    )
     tune = parser.add_argument_group("tuning")
     tune.add_argument(
         "--tune", action="store_true",
@@ -328,6 +333,7 @@ def main(argv: list[str] | None = None) -> int:
     agent: Any = SanityAgent() if args.agent == "fake" else LayaRouterAgent(
         english_checkpoint=config.english_checkpoint,
         multilingual_checkpoint=config.multilingual_checkpoint,
+        model_path=args.model,
     )
     if args.agent == "fake":
         print(SANITY_WARNING, file=sys.stderr)
