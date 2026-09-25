@@ -1,0 +1,70 @@
+{
+  "files": {
+    "injection.jsonl": {
+      "n": 163,
+      "positives": 85,
+      "by_lang": {
+        "ar": 5,
+        "de": 7,
+        "en": 118,
+        "es": 9,
+        "fr": 8,
+        "hi": 6,
+        "np": 10
+      }
+    },
+    "pii.jsonl": {
+      "n": 165,
+      "positives": 94,
+      "by_lang": {
+        "ar": 5,
+        "de": 7,
+        "en": 120,
+        "es": 9,
+        "fr": 8,
+        "hi": 6,
+        "np": 10
+      }
+    },
+    "secret_leak.jsonl": {
+      "n": 161,
+      "positives": 82,
+      "by_lang": {
+        "ar": 5,
+        "de": 7,
+        "en": 116,
+        "es": 9,
+        "fr": 8,
+        "hi": 6,
+        "np": 10
+      }
+    },
+    "toxicity.jsonl": {
+      "n": 165,
+      "positives": 84,
+      "by_lang": {
+        "ar": 5,
+        "de": 7,
+        "en": 120,
+        "es": 9,
+        "fr": 8,
+        "hi": 6,
+        "np": 10
+      }
+    }
+  },
+  "total": {
+    "n": 654,
+    "positives": 345,
+    "by_lang": {
+      "ar": 20,
+      "de": 28,
+      "en": 474,
+      "es": 36,
+      "fr": 32,
+      "hi": 24,
+      "np": 40
+    }
+  },
+  "generation_notes": "Hand-curated synthetic rows written for GateLaya, not extracted from any public benchmark — see evals/README.md LIMITATIONS. Counts computed from the JSONL files themselves."
+}

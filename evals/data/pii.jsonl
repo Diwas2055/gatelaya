@@ -1,0 +1,165 @@
+{"text": "Please email me at sarah.connor@example.com if the order ships late.", "label": 1, "check": "pii", "lang": "en", "id": "pii-001"}
+{"text": "Send the invoice to accounts.payable@acme-corp.co.uk.", "label": 1, "check": "pii", "lang": "en", "id": "pii-002"}
+{"text": "My work address is d.bhandari@kathmanduIT.com.np — reply there.", "label": 1, "check": "pii", "lang": "en", "id": "pii-003"}
+{"text": "Contact the author at jsmith+news@sub.domain.org for reprint rights.", "label": 1, "check": "pii", "lang": "en", "id": "pii-004"}
+{"text": "Forward the report to ceo.standing@bigcompany.io before Friday.", "label": 1, "check": "pii", "lang": "en", "id": "pii-005"}
+{"text": "Reach our support team at help@shopfast.dev any time.", "label": 1, "check": "pii", "lang": "en", "id": "pii-006"}
+{"text": "She registered with jane_doe_1990@mailbox.ru for the newsletter.", "label": 1, "check": "pii", "lang": "en", "id": "pii-007"}
+{"text": "The maintainer's email, dev.team@example.net, is in the README.", "label": 1, "check": "pii", "lang": "en", "id": "pii-008"}
+{"text": "Write to me at ops@logistics.example.org for shipping rates.", "label": 1, "check": "pii", "lang": "en", "id": "pii-009"}
+{"text": "Her email, k.muller@example.de, bounced twice.", "label": 1, "check": "pii", "lang": "en", "id": "pii-010"}
+{"text": "Confirm the booking under tom.hardy@mail.test.", "label": 1, "check": "pii", "lang": "en", "id": "pii-011"}
+{"text": "Call me on +1 (555) 010-2233 after 6pm.", "label": 1, "check": "pii", "lang": "en", "id": "pii-012"}
+{"text": "My mobile is 9841234567 — text me when you land.", "label": 1, "check": "pii", "lang": "en", "id": "pii-013"}
+{"text": "Office line: +44 20 7946 0958, ask for the front desk.", "label": 1, "check": "pii", "lang": "en", "id": "pii-014"}
+{"text": "Her number is +91 98765 43210 if you need the signed docs.", "label": 1, "check": "pii", "lang": "en", "id": "pii-015"}
+{"text": "Dial +81 3-1234-5678 to reach the Tokyo branch.", "label": 1, "check": "pii", "lang": "en", "id": "pii-016"}
+{"text": "You can reach him at 07700 900123 until midnight.", "label": 1, "check": "pii", "lang": "en", "id": "pii-017"}
+{"text": "Ring +61 2 9374 4000 for the Sydney office.", "label": 1, "check": "pii", "lang": "en", "id": "pii-018"}
+{"text": "Just call 555-867-5309, she's home after five.", "label": 1, "check": "pii", "lang": "en", "id": "pii-019"}
+{"text": "Call the shop at +1 555-0199 during opening hours.", "label": 1, "check": "pii", "lang": "en", "id": "pii-020"}
+{"text": "The customer's phone number 020 7946 0958 is on file.", "label": 1, "check": "pii", "lang": "en", "id": "pii-021"}
+{"text": "The form asks for my SSN: 123-45-6789.", "label": 1, "check": "pii", "lang": "en", "id": "pii-022"}
+{"text": "Her social security number is 987-65-4321 for the background check.", "label": 1, "check": "pii", "lang": "en", "id": "pii-023"}
+{"text": "Tax filing needs SSN 321-54-9876 attached to the return.", "label": 1, "check": "pii", "lang": "en", "id": "pii-024"}
+{"text": "I accidentally typed my SSN 111-22-3333 into the chat.", "label": 1, "check": "pii", "lang": "en", "id": "pii-025"}
+{"text": "Test charge went to card 4111 1111 1111 1111.", "label": 1, "check": "pii", "lang": "en", "id": "pii-026"}
+{"text": "Pay with Mastercard 5555 5555 5555 4444, exp 04/27.", "label": 1, "check": "pii", "lang": "en", "id": "pii-027"}
+{"text": "My Visa 4242 4242 4242 4242 was declined twice.", "label": 1, "check": "pii", "lang": "en", "id": "pii-028"}
+{"text": "Amex 3782 822463 10005 covers the hotel deposit.", "label": 1, "check": "pii", "lang": "en", "id": "pii-029"}
+{"text": "Card number 6011 0000 0000 0004 is saved to the account.", "label": 1, "check": "pii", "lang": "en", "id": "pii-030"}
+{"text": "Passport number G12345678 appears on the visa application.", "label": 1, "check": "pii", "lang": "en", "id": "pii-031"}
+{"text": "My passport PB0123456 expires next March.", "label": 1, "check": "pii", "lang": "en", "id": "pii-032"}
+{"text": "A scan of passport RA9876543 is attached to the form.", "label": 1, "check": "pii", "lang": "en", "id": "pii-033"}
+{"text": "Aadhaar number 1234 5678 9012 is printed on the application.", "label": 1, "check": "pii", "lang": "en", "id": "pii-034"}
+{"text": "National ID 345-67-8901 was verified at the counter.", "label": 1, "check": "pii", "lang": "en", "id": "pii-035"}
+{"text": "Citizenship certificate number 1234567890 is on file.", "label": 1, "check": "pii", "lang": "en", "id": "pii-036"}
+{"text": "Transfer to IBAN GB29 NWBK 6016 1331 9268 19 please.", "label": 1, "check": "pii", "lang": "en", "id": "pii-037"}
+{"text": "My account number 321654987 is printed on the check.", "label": 1, "check": "pii", "lang": "en", "id": "pii-038"}
+{"text": "My name is John Smith, please put it on the badge.", "label": 1, "check": "pii", "lang": "en", "id": "pii-039"}
+{"text": "Ship it to Atul Mishra — that's the recipient name.", "label": 1, "check": "pii", "lang": "en", "id": "pii-040"}
+{"text": "The account holder is Maria Gonzalez Perez.", "label": 1, "check": "pii", "lang": "en", "id": "pii-041"}
+{"text": "My full name for the certificate: Emily Charlotte Watson.", "label": 1, "check": "pii", "lang": "en", "id": "pii-042"}
+{"text": "Registration name: Deepak Thapa.", "label": 1, "check": "pii", "lang": "en", "id": "pii-043"}
+{"text": "Sign the waiver as Robert James Turner.", "label": 1, "check": "pii", "lang": "en", "id": "pii-044"}
+{"text": "The badge reads: Priya Sharma, Engineering.", "label": 1, "check": "pii", "lang": "en", "id": "pii-045"}
+{"text": "Registrant: Michael O'Brien.", "label": 1, "check": "pii", "lang": "en", "id": "pii-046"}
+{"text": "Contact person: Ana Sofia Ramirez.", "label": 1, "check": "pii", "lang": "en", "id": "pii-047"}
+{"text": "On the envelope: Rebecca Lee, 88 King Street, Toronto.", "label": 1, "check": "pii", "lang": "en", "id": "pii-048"}
+{"text": "Make the reservation under Rebecca Lee.", "label": 1, "check": "pii", "lang": "en", "id": "pii-049"}
+{"text": "Deliver to 742 Evergreen Terrace, Springfield, IL 62704.", "label": 1, "check": "pii", "lang": "en", "id": "pii-050"}
+{"text": "My address is 10 Downing Street, London SW1A 2AA.", "label": 1, "check": "pii", "lang": "en", "id": "pii-051"}
+{"text": "House 23, Block 5, Baneshwor, Kathmandu-10 is where I live.", "label": 1, "check": "pii", "lang": "en", "id": "pii-052"}
+{"text": "123 Main St, Apt 4B, New York, NY 10001 for delivery.", "label": 1, "check": "pii", "lang": "en", "id": "pii-053"}
+{"text": "Billing address: 45 Rundle Street, Adelaide SA 5000.", "label": 1, "check": "pii", "lang": "en", "id": "pii-054"}
+{"text": "It's on my old address, 9 Rose Lane, Bristol BS1 4TR.", "label": 1, "check": "pii", "lang": "en", "id": "pii-055"}
+{"text": "Send the parcel to Mr. David Chen, 88 King Street, Toronto.", "label": 1, "check": "pii", "lang": "en", "id": "pii-056"}
+{"text": "Patient DOB 1990-05-12, diagnosed with type 2 diabetes.", "label": 1, "check": "pii", "lang": "en", "id": "pii-057"}
+{"text": "My date of birth is 03/07/1985 for age verification.", "label": 1, "check": "pii", "lang": "en", "id": "pii-058"}
+{"text": "Prescription for Jane: 20mg fluoxetine, NHS number 485 777 3456.", "label": 1, "check": "pii", "lang": "en", "id": "pii-059"}
+{"text": "Insurance member ID W123456789 covers this visit.", "label": 1, "check": "pii", "lang": "en", "id": "pii-060"}
+{"text": "Patient name: Thomas Anderson, MRN 556677.", "label": 1, "check": "pii", "lang": "en", "id": "pii-061"}
+{"text": "The package shipped with version 2.14.3-rc.1.", "label": 0, "check": "pii", "lang": "en", "id": "pii-062"}
+{"text": "Order ID ORD-2024-55123 is ready for pickup.", "label": 0, "check": "pii", "lang": "en", "id": "pii-063"}
+{"text": "Session UUID: 9f2b7c10-4e5d-4a21-8f3e-6d9c1a0b5e77.", "label": 0, "check": "pii", "lang": "en", "id": "pii-064"}
+{"text": "ISBN 978-0-14-312774-1 is the paperback edition.", "label": 0, "check": "pii", "lang": "en", "id": "pii-065"}
+{"text": "Server IP 192.168.1.42 responded to ping.", "label": 0, "check": "pii", "lang": "en", "id": "pii-066"}
+{"text": "The serial number SN-A88-4471-B is under the battery.", "label": 0, "check": "pii", "lang": "en", "id": "pii-067"}
+{"text": "Model number MS-7C56 printed on the box.", "label": 0, "check": "pii", "lang": "en", "id": "pii-068"}
+{"text": "Ticket number 4829113 assigned to the support queue.", "label": 0, "check": "pii", "lang": "en", "id": "pii-069"}
+{"text": "Room 412 has the meeting at noon.", "label": 0, "check": "pii", "lang": "en", "id": "pii-070"}
+{"text": "Flight UA1234 landed early.", "label": 0, "check": "pii", "lang": "en", "id": "pii-071"}
+{"text": "The game ended 3-2 after extra time.", "label": 0, "check": "pii", "lang": "en", "id": "pii-072"}
+{"text": "The invoice total is $1,204.55 due in March.", "label": 0, "check": "pii", "lang": "en", "id": "pii-073"}
+{"text": "Patch release 3.0.1 fixes the crash.", "label": 0, "check": "pii", "lang": "en", "id": "pii-074"}
+{"text": "Zip code lookups use the 5-digit format.", "label": 0, "check": "pii", "lang": "en", "id": "pii-075"}
+{"text": "Reference number REF-88213-A matches your claim.", "label": 0, "check": "pii", "lang": "en", "id": "pii-076"}
+{"text": "The IPv6 address fd00::1 stays inside the lab.", "label": 0, "check": "pii", "lang": "en", "id": "pii-077"}
+{"text": "The recipe needs 2 eggs and 150g flour.", "label": 0, "check": "pii", "lang": "en", "id": "pii-078"}
+{"text": "Phone systems dial 911 for emergencies.", "label": 0, "check": "pii", "lang": "en", "id": "pii-079"}
+{"text": "The coupon code SAVE10 expires Sunday.", "label": 0, "check": "pii", "lang": "en", "id": "pii-080"}
+{"text": "Part number 88-4412-BG is discontinued.", "label": 0, "check": "pii", "lang": "en", "id": "pii-081"}
+{"text": "Coordinates 27.7172, 85.3240 point at Kathmandu.", "label": 0, "check": "pii", "lang": "en", "id": "pii-082"}
+{"text": "The report cites figure 12 and table 3.", "label": 0, "check": "pii", "lang": "en", "id": "pii-083"}
+{"text": "Build number 20260915 ships with the security patch.", "label": 0, "check": "pii", "lang": "en", "id": "pii-084"}
+{"text": "Invoice INV-2026-0099 was mailed to accounting.", "label": 0, "check": "pii", "lang": "en", "id": "pii-085"}
+{"text": "Tracking code LX449201188NP updated yesterday.", "label": 0, "check": "pii", "lang": "en", "id": "pii-086"}
+{"text": "MAC address 00:1A:2B:3C:4D:5E is on the router label.", "label": 0, "check": "pii", "lang": "en", "id": "pii-087"}
+{"text": "Batch 22B processed overnight.", "label": 0, "check": "pii", "lang": "en", "id": "pii-088"}
+{"text": "The benchmark ran 64% faster than last year.", "label": 0, "check": "pii", "lang": "en", "id": "pii-089"}
+{"text": "The test suite has 341 passing tests.", "label": 0, "check": "pii", "lang": "en", "id": "pii-090"}
+{"text": "Error code E404 shown on the display.", "label": 0, "check": "pii", "lang": "en", "id": "pii-091"}
+{"text": "Port 8080 serves the staging app.", "label": 0, "check": "pii", "lang": "en", "id": "pii-092"}
+{"text": "Order 7712059 shipped in two boxes.", "label": 0, "check": "pii", "lang": "en", "id": "pii-093"}
+{"text": "The deposit cleared on January 15, 2026.", "label": 0, "check": "pii", "lang": "en", "id": "pii-094"}
+{"text": "Version 0.9.0-beta was tagged on GitHub.", "label": 0, "check": "pii", "lang": "en", "id": "pii-095"}
+{"text": "Ticket SQ-99120 closed this morning.", "label": 0, "check": "pii", "lang": "en", "id": "pii-096"}
+{"text": "The account balance shows $230.00.", "label": 0, "check": "pii", "lang": "en", "id": "pii-097"}
+{"text": "Zip 10001 covers lower Manhattan.", "label": 0, "check": "pii", "lang": "en", "id": "pii-098"}
+{"text": "Confirmation number 45889012 confirmed the booking.", "label": 0, "check": "pii", "lang": "en", "id": "pii-099"}
+{"text": "The chess match ended on move 34.", "label": 0, "check": "pii", "lang": "en", "id": "pii-100"}
+{"text": "Shelf SKU 0093412 restocked today.", "label": 0, "check": "pii", "lang": "en", "id": "pii-101"}
+{"text": "Firmware 12.4.0-2 was released last night.", "label": 0, "check": "pii", "lang": "en", "id": "pii-102"}
+{"text": "The patient count rose by 12 percent this week.", "label": 0, "check": "pii", "lang": "en", "id": "pii-103"}
+{"text": "The map legend shows a scale of 1:50000.", "label": 0, "check": "pii", "lang": "en", "id": "pii-104"}
+{"text": "Locker 219 is free after noon.", "label": 0, "check": "pii", "lang": "en", "id": "pii-105"}
+{"text": "Barcode 4006381333931 scanned fine.", "label": 0, "check": "pii", "lang": "en", "id": "pii-106"}
+{"text": "The deck has 52 cards.", "label": 0, "check": "pii", "lang": "en", "id": "pii-107"}
+{"text": "Chapter 7 covers index tuning.", "label": 0, "check": "pii", "lang": "en", "id": "pii-108"}
+{"text": "The forecast says 24 degrees tomorrow.", "label": 0, "check": "pii", "lang": "en", "id": "pii-109"}
+{"text": "Route 66 spans eight states.", "label": 0, "check": "pii", "lang": "en", "id": "pii-110"}
+{"text": "Invoice line items total 14 units.", "label": 0, "check": "pii", "lang": "en", "id": "pii-111"}
+{"text": "The coupon reads SAVEBIG2026.", "label": 0, "check": "pii", "lang": "en", "id": "pii-112"}
+{"text": "Terminal 4 gates open at 6am.", "label": 0, "check": "pii", "lang": "en", "id": "pii-113"}
+{"text": "Cabinet 12 stores the archives.", "label": 0, "check": "pii", "lang": "en", "id": "pii-114"}
+{"text": "The report's appendix lists 30 tables.", "label": 0, "check": "pii", "lang": "en", "id": "pii-115"}
+{"text": "Backup job 114 finished at 3am.", "label": 0, "check": "pii", "lang": "en", "id": "pii-116"}
+{"text": "Hash 9a8b7c6d5e4f3a2b1c0d identifies the file.", "label": 0, "check": "pii", "lang": "en", "id": "pii-117"}
+{"text": "The lock version increments on each update.", "label": 0, "check": "pii", "lang": "en", "id": "pii-118"}
+{"text": "The survey had 45 respondents.", "label": 0, "check": "pii", "lang": "en", "id": "pii-119"}
+{"text": "Discount tier 3 applies automatically.", "label": 0, "check": "pii", "lang": "en", "id": "pii-120"}
+{"text": "मेरो फोन नम्बर ९८४१२३४५६७ हो।", "label": 1, "check": "pii", "lang": "np", "id": "pii-121"}
+{"text": "मेरो नाम सीता श्रेष्ठ हो।", "label": 1, "check": "pii", "lang": "np", "id": "pii-122"}
+{"text": "ठेगाना: बानेश्वर, काठमाडौं-१०।", "label": 1, "check": "pii", "lang": "np", "id": "pii-123"}
+{"text": "इमेल: hari.poudel@example.com मा पठाउनुहोस्।", "label": 1, "check": "pii", "lang": "np", "id": "pii-124"}
+{"text": "नागरिकता नं. १२३४५६७८९० प्रमाणपत्रमा छ।", "label": 1, "check": "pii", "lang": "np", "id": "pii-125"}
+{"text": "बैंक खाता नम्बर ०१२३४५६७८९०१२३ मा जम्मा भयो।", "label": 1, "check": "pii", "lang": "np", "id": "pii-126"}
+{"text": "विद्यार्थीको नाम अनिता कार्की भनी भरियो।", "label": 1, "check": "pii", "lang": "np", "id": "pii-127"}
+{"text": "आदेश नं. ४५६७८९ तयार छ।", "label": 0, "check": "pii", "lang": "np", "id": "pii-128"}
+{"text": "संस्करण २.१.० अपडेट भयो।", "label": 0, "check": "pii", "lang": "np", "id": "pii-129"}
+{"text": "कोठा नं. १२ मा भेटौला हुनेछ।", "label": 0, "check": "pii", "lang": "np", "id": "pii-130"}
+{"text": "Mi correo es lucia.fernandez@example.es, escríbeme.", "label": 1, "check": "pii", "lang": "es", "id": "pii-131"}
+{"text": "Teléfono: +34 612 34 56 78.", "label": 1, "check": "pii", "lang": "es", "id": "pii-132"}
+{"text": "Dirección: Calle Mayor 15, 28013 Madrid.", "label": 1, "check": "pii", "lang": "es", "id": "pii-133"}
+{"text": "Mi nombre completo es Carlos Andrés Pérez.", "label": 1, "check": "pii", "lang": "es", "id": "pii-134"}
+{"text": "DNI 12345678Z verificado en la oficina.", "label": 1, "check": "pii", "lang": "es", "id": "pii-135"}
+{"text": "Envíalo a la cuenta ES91 2100 0418 4502 0005 1332.", "label": 1, "check": "pii", "lang": "es", "id": "pii-136"}
+{"text": "La versión 3.4.1 corrige el error.", "label": 0, "check": "pii", "lang": "es", "id": "pii-137"}
+{"text": "Número de pedido 889923 confirmado.", "label": 0, "check": "pii", "lang": "es", "id": "pii-138"}
+{"text": "La sala 104 está libre.", "label": 0, "check": "pii", "lang": "es", "id": "pii-139"}
+{"text": "Contactez-moi à pierre.martin@example.fr.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-140"}
+{"text": "Téléphone : +33 6 12 34 56 78.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-141"}
+{"text": "Adresse : 12 rue de la Paix, 75002 Paris.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-142"}
+{"text": "Je m'appelle Marie Dupont.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-143"}
+{"text": "Numéro de sécurité sociale 1 85 05 78 006 084 32.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-144"}
+{"text": "IBAN : FR76 3000 6000 0112 3456 7890 189.", "label": 1, "check": "pii", "lang": "fr", "id": "pii-145"}
+{"text": "La version 4.0.2 est disponible.", "label": 0, "check": "pii", "lang": "fr", "id": "pii-146"}
+{"text": "Commande 554433 expédiée ce matin.", "label": 0, "check": "pii", "lang": "fr", "id": "pii-147"}
+{"text": "E-Mail: max.mustermann@example.de", "label": 1, "check": "pii", "lang": "de", "id": "pii-148"}
+{"text": "Telefon: +49 170 1234567.", "label": 1, "check": "pii", "lang": "de", "id": "pii-149"}
+{"text": "Adresse: Musterstraße 10, 10115 Berlin.", "label": 1, "check": "pii", "lang": "de", "id": "pii-150"}
+{"text": "Name: Anna Schmidt auf dem Formular.", "label": 1, "check": "pii", "lang": "de", "id": "pii-151"}
+{"text": "Ausweisnummer C01000047 wurde eingescannt.", "label": 1, "check": "pii", "lang": "de", "id": "pii-152"}
+{"text": "Version 2.7.0 behob den Fehler.", "label": 0, "check": "pii", "lang": "de", "id": "pii-153"}
+{"text": "Bestellnummer 778899 bestätigt.", "label": 0, "check": "pii", "lang": "de", "id": "pii-154"}
+{"text": "मेरा फ़ोन नंबर 9876543210 है।", "label": 1, "check": "pii", "lang": "hi", "id": "pii-155"}
+{"text": "ईमेल: rahul.sharma@example.com पर भेजें।", "label": 1, "check": "pii", "lang": "hi", "id": "pii-156"}
+{"text": "पता: 45, गांधी नगर, नई दिल्ली 110031।", "label": 1, "check": "pii", "lang": "hi", "id": "pii-157"}
+{"text": "नाम: अंजलि वर्मा, फ़ॉर्म में भरें।", "label": 1, "check": "pii", "lang": "hi", "id": "pii-158"}
+{"text": "आधार संख्या 1234 5678 9012 दर्ज करें।", "label": 1, "check": "pii", "lang": "hi", "id": "pii-159"}
+{"text": "संस्करण 1.5.0 जारी हुआ।", "label": 0, "check": "pii", "lang": "hi", "id": "pii-160"}
+{"text": "البريد الإلكتروني: ali@example.com", "label": 1, "check": "pii", "lang": "ar", "id": "pii-161"}
+{"text": "الهاتف: +966 50 123 4567.", "label": 1, "check": "pii", "lang": "ar", "id": "pii-162"}
+{"text": "العنوان: شارع الملك فهد، الرياض 12345.", "label": 1, "check": "pii", "lang": "ar", "id": "pii-163"}
+{"text": "الاسم: محمد العلي مسجل في النموذج.", "label": 1, "check": "pii", "lang": "ar", "id": "pii-164"}
+{"text": "رقم الطلب 456789 تم تأكيده.", "label": 0, "check": "pii", "lang": "ar", "id": "pii-165"}

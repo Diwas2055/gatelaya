@@ -65,7 +65,7 @@ The open, local, multilingual alternative to cloud moderation APIs for LLM gatew
 
 ## Success Criteria
 - P95 guardrail overhead < 100ms per request (model forward ~33ms + hook overhead) — measurable now
-- Injection/PII block accuracy ≥ 0.90 and Mean ECE ≤ 0.15 — **targets pending**: require a labeled eval set + eval script (planned), run after calibration
+- Injection/PII block accuracy ≥ 0.90 and Mean ECE ≤ 0.15 — **not met (first run)**: labeled eval set (`evals/data/`, 654 rows) + `scripts/eval.py` shipped; real-model run 2026-09-25 (laya 0.3.20, zero-shot, uncalibrated): pii+injection macro accuracy 0.669, ECE 0.213 → **FAIL**. Next: calibrate on labeled traffic, then re-run; fine-tune if zero-shot ceiling holds
 - Drop-in: existing OpenAI client works unchanged against guarded LiteLLM endpoint — verified by integration tests
 - Full audit coverage: 100% of guarded requests logged with decision + probabilities — covered by unit tests
 

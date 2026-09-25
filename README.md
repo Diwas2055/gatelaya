@@ -47,20 +47,18 @@ Services: `litellm-gatelaya` (port 4000), `postgres` (16-alpine, audit sink), `r
 ### Local
 
 ```bash
-python3.12 -m venv .venv && source .venv/bin/activate
-pip install -e .                        # litellm, fastapi, sqlalchemy[asyncio], pydantic>=2
-pip install "litellm[proxy]"            # proxy server CLI (uvicorn) — also what the Dockerfile installs
-pip install laya                        # decision model; weights (~800MB) download on first predict
-pip install asyncpg                     # only if you set GATELAYA_DATABASE_URL (Postgres)
-pip install -e ".[dev]"                 # pytest, pytest-asyncio, aiosqlite
+uv sync                              # base deps + dev group (litellm[proxy], fastapi, sqlalchemy, pytest)
+uv sync --extra model                # adds laya; weights (~800MB) download on first predict
+uv sync --all-extras                 # everything (model, redis, dev)
+uv add asyncpg                       # only if you set GATELAYA_DATABASE_URL (Postgres)
 
-pytest                                  # 143 passed
+uv run pytest                        # 231 passed, 1 skipped
 
 export OPENAI_API_KEY=sk-...
 export LITELLM_MASTER_KEY=sk-gatelaya-local
 export GATELAYA_CALIBRATION_PATH=./calibration.json   # see Calibration
 
-litellm --config proxy_config.yaml --port 4000
+uv run litellm --config proxy_config.yaml --port 4000
 ```
 
 `proxy_config.yaml` registers the guardrail under `guardrails:` with `mode: [pre_call, post_call]` and `default_on: true`.
@@ -323,8 +321,8 @@ FastAPI dashboard API over the same `guardrail_decisions` table the proxy writes
 ### Run
 
 ```bash
-gatelaya-dashboard              # console script (host/port from settings)
-uvicorn dashboard.main:app      # equivalent, default port 8080
+uv run gatelaya-dashboard         # console script (host/port from settings)
+uv run uvicorn dashboard.main:app # equivalent, default port 8080
 ```
 
 The app creates both tables on boot (SQLite by default; point `GATELAYA_DATABASE_URL` at the proxy's database to see live traffic). The frontend is served from `dashboard/static/` at `/`.
@@ -354,7 +352,7 @@ The app creates both tables on boot (SQLite by default; point `GATELAYA_DATABASE
 | GET | `/api/config` | current config (file or defaults) + path + exists |
 | PUT | `/api/config` | patch thresholds/actions/enabled_checks/fail_open → writes YAML |
 | GET | `/api/calibration` | temperature map (null when not yet fitted) |
-| POST | `/api/calibration/upload` | multipart JSONL dataset → refit temperatures (503 until `pip install laya`) |
+| POST | `/api/calibration/upload` | multipart JSONL dataset → refit temperatures (503 until `uv sync --extra model`) |
 
 **`restart_required` semantics:** the dashboard only writes files (`gatelaya.yaml`, `calibration.json`) and returns `restart_required: true` — the LiteLLM proxy process loads them at boot. Restart the proxy to apply changes; the dashboard never hot-patches it. Decisions expose `input_sha256` only: raw prompt text never leaves the audit log (operators paste it into review labels for calibration export).
 
@@ -403,6 +401,39 @@ Dependency direction: `custom_guardrail.gatelaya` → `gatelaya.guardrail` → (
 - **`fail_open=true` by default**: an agent/model crash allows the request (audited as `agent_error`). Set `GATELAYA_FAIL_OPEN=false` for fail-closed deployments.
 - **No per-key / per-team thresholds in code** — one config per proxy process.
 - **In-memory audit sink is capped and volatile**; use Postgres for anything you need to keep.
+
+## Evaluation
+
+Labeled eval dataset, metrics library, and CLI that measure GateLaya against its own gate targets.
+
+**Gate targets** (PRODUCT.md, single source of truth in `gatelaya/metrics.py`): macro accuracy ≥ **0.90**, macro ECE ≤ **0.15**, computed over the evaluated checks (run `--check pii --check injection` for the exact PRODUCT.md scope).
+
+- **Dataset** — `evals/data/*.jsonl`, 654 hand-curated rows (`pii` 165 · `injection` 163 · `toxicity` 165 · `secret_leak` 161), 52.7% positive, 27.5% non-English across `en np es fr de hi ar`. Row schema, per-file targets (≥160 rows, ≥40% positive, ≥25% non-English), and `manifest.json` counts are enforced by tests. See [`evals/README.md`](evals/README.md) for the format spec and **limitations** (synthetic, single-annotator, directional — not a public benchmark).
+- **Metrics** — accuracy / precision / recall / F1, calibration bins, and ECE (Guo et al. 2017 binning), plus macro averages and a gate verdict (`gatelaya/metrics.py`).
+
+```bash
+# Full eval with the real model (requires: uv sync --extra model)
+uv run scripts/eval.py --report evals/results/full.json
+
+# PRODUCT.md scope with the gate (exit 1 on failure)
+uv run scripts/eval.py --check pii --check injection --gate
+
+# Smoke run — first 5 rows per check; plumbing-only run without the model
+uv run scripts/eval.py --limit 5
+uv run scripts/eval.py --agent fake --limit 8   # SANITY MODE, not real results
+```
+
+**First real-model run** (laya 0.3.20, 2026-09-25, zero-shot default thresholds, no calibration file):
+
+| Check | n | Accuracy | ECE |
+|---|---:|---:|---:|
+| injection | 163 | 0.853 | 0.129 |
+| pii | 165 | 0.485 | 0.297 |
+| secret_leak | 161 | 0.832 | 0.263 |
+| toxicity | 165 | 0.491 | 0.200 |
+| **macro (all)** | **654** | **0.665** | **0.222** |
+
+**GATE FAIL** — macro accuracy 0.665 < 0.90, macro ECE 0.222 > 0.15. PRODUCT.md scope (`pii` + `injection`, n=328): accuracy 0.669, ECE 0.213 → also fail. Notable: `toxicity` recall 0.0 (never fires at the default threshold), `pii` recall 0.096. This matches the documented zero-shot ceiling — run calibration (`scripts/calibrate.py`) on labeled traffic before judging the gate. Artifacts: `evals/results/first-run.json`, `evals/results/first-run-product-scope.json`.
 
 ## Roadmap
 

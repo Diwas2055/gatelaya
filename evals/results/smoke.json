@@ -1,0 +1,335 @@
+{
+  "checks": [
+    {
+      "bins": [
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.020240000000000036,
+          "mean_conf": 0.97976,
+          "n": 5
+        }
+      ],
+      "check": "injection",
+      "ece": 0.020240000000000036,
+      "metrics": {
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "n": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tn": 0,
+        "tp": 5
+      },
+      "threshold": 0.9
+    },
+    {
+      "bins": [
+        {
+          "frac_positive": 1.0,
+          "gap": 0.9637,
+          "mean_conf": 0.0363,
+          "n": 2
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.8573,
+          "mean_conf": 0.1427,
+          "n": 1
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.47709999999999997,
+          "mean_conf": 0.5229,
+          "n": 1
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.08740000000000003,
+          "mean_conf": 0.9126,
+          "n": 1
+        }
+      ],
+      "check": "pii",
+      "ece": 0.6698400000000001,
+      "metrics": {
+        "accuracy": 0.2,
+        "f1": 0.33333333333333337,
+        "fn": 4,
+        "fp": 0,
+        "n": 5,
+        "precision": 1.0,
+        "recall": 0.2,
+        "tn": 0,
+        "tp": 1
+      },
+      "threshold": 0.85
+    },
+    {
+      "bins": [
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.02311999999999992,
+          "mean_conf": 0.9768800000000001,
+          "n": 5
+        }
+      ],
+      "check": "secret_leak",
+      "ece": 0.02311999999999992,
+      "metrics": {
+        "accuracy": 1.0,
+        "f1": 1.0,
+        "fn": 0,
+        "fp": 0,
+        "n": 5,
+        "precision": 1.0,
+        "recall": 1.0,
+        "tn": 0,
+        "tp": 5
+      },
+      "threshold": 0.85
+    },
+    {
+      "bins": [
+        {
+          "frac_positive": 1.0,
+          "gap": 0.9144,
+          "mean_conf": 0.0856,
+          "n": 1
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.45724999999999993,
+          "mean_conf": 0.5427500000000001,
+          "n": 2
+        },
+        {
+          "frac_positive": 1.0,
+          "gap": 0.3669,
+          "mean_conf": 0.6331,
+          "n": 2
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        },
+        {
+          "frac_positive": 0.0,
+          "gap": 0.0,
+          "mean_conf": 0.0,
+          "n": 0
+        }
+      ],
+      "check": "toxicity",
+      "ece": 0.51254,
+      "metrics": {
+        "accuracy": 0.0,
+        "f1": 0.0,
+        "fn": 5,
+        "fp": 0,
+        "n": 5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "tn": 0,
+        "tp": 0
+      },
+      "threshold": 0.9
+    }
+  ],
+  "gate": {
+    "failures": [
+      "macro accuracy 0.5500 < min_accuracy 0.9000",
+      "macro ece 0.3064 > max_ece 0.1500"
+    ],
+    "passed": false,
+    "target": {
+      "max_ece": 0.15,
+      "min_accuracy": 0.9
+    }
+  },
+  "macro": {
+    "accuracy": 0.55,
+    "ece": 0.306435,
+    "f1": 0.5833333333333334,
+    "precision": 0.75,
+    "recall": 0.55
+  },
+  "n": 20
+}

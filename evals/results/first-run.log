@@ -1,0 +1,17 @@
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files: 100%|██████████| 5/5 [00:00<00:00, 1361.26it/s]
+./.venv/lib/python3.12/site-packages/laya/agent.py:928: RuntimeWarning: laya: this checkpoint ships invalid temperatures or values outside [0.5, 5]; using choice:11+=0.10058280825614929 -> 0.5. Treat confidence from the affected entries as uncalibrated.
+  return Agent(model_id_or_path, device=device, token=token, subfolder=subfolder, fast=fast,
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files: 100%|██████████| 5/5 [00:00<00:00, 684.76it/s]
+check              n      acc        P        R       F1      ECE
+-----------------------------------------------------------------
+injection        163    0.853    0.828    0.906    0.865    0.129
+pii              165    0.485    1.000    0.096    0.175    0.297
+secret_leak      161    0.832    0.802    0.890    0.844    0.263
+toxicity         165    0.491    0.000    0.000    0.000    0.200
+-----------------------------------------------------------------
+macro            654    0.665    0.658    0.473    0.471    0.222
+
+GATE FAIL (min_accuracy 0.90, max_ece 0.15)
+  - macro accuracy 0.6652 < min_accuracy 0.9000
+  - macro ece 0.2223 > max_ece 0.1500
+wrote evals/results/first-run.json

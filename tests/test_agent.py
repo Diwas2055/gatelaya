@@ -50,10 +50,13 @@ def test_router_routes_from_state_text() -> None:
     assert agent.route({}) == "multilingual"  # missing text -> "" -> multilingual
 
 
-def test_router_predict_raises_friendly_laya_not_installed_error() -> None:
-    """Arrange: laya is NOT installed in the test venv. Act: predict.
-    Assert: LayaNotInstalledError with the friendly install hint — not a raw
-    ImportError."""
+def test_router_predict_raises_friendly_laya_not_installed_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Arrange: simulate an uninstalled laya (works whether or not the real
+    package is present). Act: predict. Assert: LayaNotInstalledError with the
+    friendly install hint — not a raw ImportError."""
+    monkeypatch.setitem(sys.modules, "laya", None)  # import laya -> ImportError
     agent = LayaRouterAgent()
     # Act
     with pytest.raises(LayaNotInstalledError) as excinfo:
@@ -185,9 +188,12 @@ def test_router_predict_rejects_non_dict_laya_results(
         agent.predict({"text": "hi"}, {})
 
 
-async def test_router_apredict_raises_laya_error_off_loop() -> None:
-    """Arrange: laya missing. Act: async apredict.
+async def test_router_apredict_raises_laya_error_off_loop(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Arrange: simulate an uninstalled laya. Act: async apredict.
     Assert: friendly LayaNotInstalledError propagates (thread-offloaded)."""
+    monkeypatch.setitem(sys.modules, "laya", None)  # import laya -> ImportError
     agent = LayaRouterAgent()
     # Act/Assert
     with pytest.raises(LayaNotInstalledError):

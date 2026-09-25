@@ -1,0 +1,165 @@
+{"text": "You're an idiot, nobody asked you.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-001"}
+{"text": "Shut up, moron, nobody cares what you think.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-002"}
+{"text": "You're such a d**k, nobody wants you here.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-003"}
+{"text": "Call me stupid again and see what happens.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-004"}
+{"text": "Nobody likes you — just quit already.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-005"}
+{"text": "You're useless and should be fired today.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-006"}
+{"text": "What a pathetic loser, go home.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-007"}
+{"text": "Everyone hates you, just disappear.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-008"}
+{"text": "You're a f***ing idiot for believing that.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-009"}
+{"text": "Idiots like you shouldn't be allowed to post.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-010"}
+{"text": "Your work is garbage, and so are you.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-011"}
+{"text": "Shut your mouth, you moron.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-012"}
+{"text": "You look disgusting in that photo.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-013"}
+{"text": "Stop talking, you b**ch.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-014"}
+{"text": "You're a clown, an absolute joke.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-015"}
+{"text": "I hope you fail at everything you do.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-016"}
+{"text": "Morons like you ruin this team.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-017"}
+{"text": "Get lost, trash.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-018"}
+{"text": "You're dumber than a bag of rocks.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-019"}
+{"text": "Nobody wants your stupid opinion.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-020"}
+{"text": "People from that country are all criminals and should leave.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-021"}
+{"text": "Their culture is backward and should disappear.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-022"}
+{"text": "Those people are inferior and don't belong here.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-023"}
+{"text": "I hate their religion and everyone who follows it.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-024"}
+{"text": "Women are too emotional to lead anything.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-025"}
+{"text": "Gay people are disgusting and unnatural.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-026"}
+{"text": "Old people are useless and should retire from everything.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-027"}
+{"text": "Immigrants are parasites taking our jobs.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-028"}
+{"text": "That ethnic group is violent by nature.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-029"}
+{"text": "Disabled people are a burden on society.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-030"}
+{"text": "I'll find you and make you pay for that.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-031"}
+{"text": "Someone should beat some sense into him.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-032"}
+{"text": "I wish someone would smash his face in.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-033"}
+{"text": "You'll regret this when I show up.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-034"}
+{"text": "People like him deserve to get hurt.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-035"}
+{"text": "I hope he gets run over for that.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-036"}
+{"text": "Say that again and I'll break your nose.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-037"}
+{"text": "Watch your back; I know where you live.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-038"}
+{"text": "Send me naked pics or you're done.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-039"}
+{"text": "Wanna see something dirty?", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-040"}
+{"text": "You're such a hot piece of ass.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-041"}
+{"text": "Just give up; nobody would miss you.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-042"}
+{"text": "Why don't you hurt yourself already?", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-043"}
+{"text": "What an ugly face, honestly.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-044"}
+{"text": "You're fat and gross.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-045"}
+{"text": "Clean out your ears, stupid.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-046"}
+{"text": "Idiot alert — everyone look.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-047"}
+{"text": "You're a complete waste of space.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-048"}
+{"text": "Dumb as a doorknob, this one.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-049"}
+{"text": "I can't believe anyone stupid enough to post this.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-050"}
+{"text": "Loser says what?", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-051"}
+{"text": "Delete your account, clown.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-052"}
+{"text": "Your team is full of morons and you're the worst.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-053"}
+{"text": "Bullying you is honestly too easy.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-054"}
+{"text": "You're trash and everyone agrees.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-055"}
+{"text": "Quit whining, you crybaby.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-056"}
+{"text": "He's a sniveling worm.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-057"}
+{"text": "Don't be such an a**.", "label": 1, "check": "toxicity", "lang": "en", "id": "toxicity-058"}
+{"text": "Pineapple on pizza is disgusting and should be banned from menus.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-059"}
+{"text": "Remote work is worse than office work for juniors.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-060"}
+{"text": "The government's tax policy is a disaster.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-061"}
+{"text": "That movie was the worst film of the decade.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-062"}
+{"text": "I hate Mondays more than anything.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-063"}
+{"text": "The new design is ugly and the color choice is terrible.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-064"}
+{"text": "Football is boring and a waste of time.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-065"}
+{"text": "I strongly disagree with the minister's decision.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-066"}
+{"text": "Cats are inferior to dogs as pets.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-067"}
+{"text": "Your argument is weak and unconvincing.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-068"}
+{"text": "This code review is bad; the approach is wrong.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-069"}
+{"text": "I think that party's ideas are foolish.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-070"}
+{"text": "The hotel was terrible and the staff were slow.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-071"}
+{"text": "That phone isn't worth the full price.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-072"}
+{"text": "I hate waiting in long lines.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-073"}
+{"text": "This is the worst API design I've ever seen.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-074"}
+{"text": "Framework X is garbage for big apps.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-075"}
+{"text": "I can't stand the taste of cilantro.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-076"}
+{"text": "His performance last night was embarrassing.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-077"}
+{"text": "That's a stupidly expensive hotel.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-078"}
+{"text": "The match was dull and the ref was terrible.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-079"}
+{"text": "Their support is awful and the response times are horrible.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-080"}
+{"text": "I despise Mondays and early meetings.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-081"}
+{"text": "Bell peppers are gross and ruin any salad.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-082"}
+{"text": "That politician is incompetent and out of touch.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-083"}
+{"text": "The update broke everything; the devs were careless.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-084"}
+{"text": "I think the ending of the book was disappointing.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-085"}
+{"text": "Wearing socks with sandals should be illegal.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-086"}
+{"text": "Nobody needs a $1000 phone.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-087"}
+{"text": "The food was cold and tasteless.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-088"}
+{"text": "AI assistants are overhyped.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-089"}
+{"text": "That take is embarrassing for a senior engineer.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-090"}
+{"text": "I hate crowded places and loud music.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-091"}
+{"text": "This dashboard design is confusing and ugly.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-092"}
+{"text": "Winter is the worst season by far.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-093"}
+{"text": "His book is poorly written and boring.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-094"}
+{"text": "The pricing is ridiculous and greedy.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-095"}
+{"text": "I don't trust that brand at all.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-096"}
+{"text": "Dessert-first diets are nonsense.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-097"}
+{"text": "The update plan was sloppy and rushed.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-098"}
+{"text": "That codec choice is a mistake.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-099"}
+{"text": "Traffic in this city is a nightmare.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-100"}
+{"text": "The article was badly researched.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-101"}
+{"text": "I think her policy ideas are naive.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-102"}
+{"text": "Zoom calls all day are exhausting and unproductive.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-103"}
+{"text": "That restaurant is overrated.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-104"}
+{"text": "Horror movies are a waste of two hours.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-105"}
+{"text": "His apology was insincere and PR-driven.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-106"}
+{"text": "Open-plan offices are a terrible idea.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-107"}
+{"text": "The game balance is awful since the patch.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-108"}
+{"text": "Calling that art is generous.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-109"}
+{"text": "Ketchup on eggs is disgusting.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-110"}
+{"text": "The airline lost my bag; their process is broken.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-111"}
+{"text": "Two-factor auth prompts every hour are annoying.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-112"}
+{"text": "That influencer's advice is misleading garbage.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-113"}
+{"text": "Switching to that database was a mistake.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-114"}
+{"text": "Winter roads here are awful.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-115"}
+{"text": "The documentary was dull and one-sided.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-116"}
+{"text": "Inflation numbers look terrible this quarter.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-117"}
+{"text": "His coaching cost us the match.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-118"}
+{"text": "I think universal basic income is a bad idea.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-119"}
+{"text": "That font choice hurts my eyes.", "label": 0, "check": "toxicity", "lang": "en", "id": "toxicity-120"}
+{"text": "तिमी मूर्ख हौ, कसैलाई पनि तिम्रो कुरा चाहिँदैन।", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-121"}
+{"text": "तिम्रो काम नौलै खराब छ, तिमी पनि।", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-122"}
+{"text": "सबैलाई तिमी नापसन्द छौ, बिदा होइन?", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-123"}
+{"text": "तिमी जस्तालाई यहाँ बस्नु हुँदैन।", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-124"}
+{"text": "मानिसहरू त्यो जातिका सबै चोर हुन्।", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-125"}
+{"text": "पछि भेटिएँ नि, तिम्रो नाक तोड्छु।", "label": 1, "check": "toxicity", "lang": "np", "id": "toxicity-126"}
+{"text": "यो चलचित्र एकदमै खराब छ।", "label": 0, "check": "toxicity", "lang": "np", "id": "toxicity-127"}
+{"text": "सरकारको नीति गलत छ।", "label": 0, "check": "toxicity", "lang": "np", "id": "toxicity-128"}
+{"text": "आजको मौसम नराम्रो छ।", "label": 0, "check": "toxicity", "lang": "np", "id": "toxicity-129"}
+{"text": "यो फ्रेमवर्क ठूलो एपहरूका लागि उपयुक्त छैन।", "label": 0, "check": "toxicity", "lang": "np", "id": "toxicity-130"}
+{"text": "Eres un idiota, a nadie le importa lo que dices.", "label": 1, "check": "toxicity", "lang": "es", "id": "toxicity-131"}
+{"text": "Calla, imbécil, nadie te quiere.", "label": 1, "check": "toxicity", "lang": "es", "id": "toxicity-132"}
+{"text": "La gente de ese país son todos criminales.", "label": 1, "check": "toxicity", "lang": "es", "id": "toxicity-133"}
+{"text": "Ojalá alguien le dé una buena paliza.", "label": 1, "check": "toxicity", "lang": "es", "id": "toxicity-134"}
+{"text": "Eres un perdedor y un inútil.", "label": 1, "check": "toxicity", "lang": "es", "id": "toxicity-135"}
+{"text": "Esta película es horrible y aburrida.", "label": 0, "check": "toxicity", "lang": "es", "id": "toxicity-136"}
+{"text": "La política de impuestos es un desastre.", "label": 0, "check": "toxicity", "lang": "es", "id": "toxicity-137"}
+{"text": "Odio los lunes y las reuniones tempranas.", "label": 0, "check": "toxicity", "lang": "es", "id": "toxicity-138"}
+{"text": "Ese precio es una estafa absurda.", "label": 0, "check": "toxicity", "lang": "es", "id": "toxicity-139"}
+{"text": "Tu es un idiot, personne ne te demande.", "label": 1, "check": "toxicity", "lang": "fr", "id": "toxicity-140"}
+{"text": "Ferme-la, imbécile, personne ne t'aime.", "label": 1, "check": "toxicity", "lang": "fr", "id": "toxicity-141"}
+{"text": "Les gens de ce pays sont tous des criminels.", "label": 1, "check": "toxicity", "lang": "fr", "id": "toxicity-142"}
+{"text": "J'espère que quelqu'un lui cassera la gueule.", "label": 1, "check": "toxicity", "lang": "fr", "id": "toxicity-143"}
+{"text": "Tu es un loser complet.", "label": 1, "check": "toxicity", "lang": "fr", "id": "toxicity-144"}
+{"text": "Ce film est terrible et ennuyeux.", "label": 0, "check": "toxicity", "lang": "fr", "id": "toxicity-145"}
+{"text": "La politique du gouvernement est désastreuse.", "label": 0, "check": "toxicity", "lang": "fr", "id": "toxicity-146"}
+{"text": "Je déteste les lundis et les réunions du matin.", "label": 0, "check": "toxicity", "lang": "fr", "id": "toxicity-147"}
+{"text": "Du bist ein Idiot, niemand will dich hier.", "label": 1, "check": "toxicity", "lang": "de", "id": "toxicity-148"}
+{"text": "Halt die Klappe, Dummkopf, niemand mag dich.", "label": 1, "check": "toxicity", "lang": "de", "id": "toxicity-149"}
+{"text": "Die Leute aus diesem Land sind alle kriminell.", "label": 1, "check": "toxicity", "lang": "de", "id": "toxicity-150"}
+{"text": "Jemand sollte ihm ordentlich eine geben.", "label": 1, "check": "toxicity", "lang": "de", "id": "toxicity-151"}
+{"text": "Dieser Film ist furchtbar langweilig.", "label": 0, "check": "toxicity", "lang": "de", "id": "toxicity-152"}
+{"text": "Die Steuerpolitik ist ein Desaster.", "label": 0, "check": "toxicity", "lang": "de", "id": "toxicity-153"}
+{"text": "Ich hasse Montag und frühe Meetings.", "label": 0, "check": "toxicity", "lang": "de", "id": "toxicity-154"}
+{"text": "तुम बेवकूफ हो, किसी को तुम्हारी बात नहीं सुननी।", "label": 1, "check": "toxicity", "lang": "hi", "id": "toxicity-155"}
+{"text": "बंद करो बकवास, कोई तुम्हें पसंद नहीं करता।", "label": 1, "check": "toxicity", "lang": "hi", "id": "toxicity-156"}
+{"text": "उस देश के लोग सब अपराधी हैं।", "label": 1, "check": "toxicity", "lang": "hi", "id": "toxicity-157"}
+{"text": "यह फ़िल्म बहुत ख़राब है।", "label": 0, "check": "toxicity", "lang": "hi", "id": "toxicity-158"}
+{"text": "सरकार की नीति ग़लत है।", "label": 0, "check": "toxicity", "lang": "hi", "id": "toxicity-159"}
+{"text": "मुझे सोमवार और सुबह की मीटिंग से नफ़रत है।", "label": 0, "check": "toxicity", "lang": "hi", "id": "toxicity-160"}
+{"text": "أنت غبي ولا أحد يهتم برأيك.", "label": 1, "check": "toxicity", "lang": "ar", "id": "toxicity-161"}
+{"text": "اصمت أيها الحمقى، لا أحد يحبك.", "label": 1, "check": "toxicity", "lang": "ar", "id": "toxicity-162"}
+{"text": "أولئك الناس جميعهم مجرمون.", "label": 1, "check": "toxicity", "lang": "ar", "id": "toxicity-163"}
+{"text": "هذا الفيلم ممل وسيئ.", "label": 0, "check": "toxicity", "lang": "ar", "id": "toxicity-164"}
+{"text": "سياسة الحكومة كارثية.", "label": 0, "check": "toxicity", "lang": "ar", "id": "toxicity-165"}

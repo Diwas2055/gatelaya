@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Multilingual LLM guardrail pack: Laya decision model on LiteLLM Proxy"
 requires-python = ">=3.12"
 dependencies = [
-    "litellm",
+    "litellm[proxy]",
     "fastapi",
     "uvicorn",
     "python-multipart",
@@ -23,6 +23,10 @@ dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
 
 [project.scripts]
 gatelaya-dashboard = "dashboard.main:run"
+
+# uv: `uv sync` installs dev group by default; model/redis via --extra
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
 
 [tool.setuptools]
 packages = [
