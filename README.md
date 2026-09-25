@@ -49,15 +49,25 @@ export LITELLM_MASTER_KEY=sk-gatelaya-local
 docker compose up --build
 ```
 
-Services: `litellm-gatelaya` (port 4000), `postgres` (16-alpine, audit sink), `redis` (7-alpine). `GATELAYA_DATABASE_URL` is preset to the compose Postgres; thresholds and `GATELAYA_FAIL_OPEN` are overridable from the shell.
+Services: `litellm-gatelaya` (port 4000), `dashboard` (port 8080), `postgres` (16-alpine, audit sink), `redis` (7-alpine). `GATELAYA_DATABASE_URL` is preset to the compose Postgres; thresholds and `GATELAYA_FAIL_OPEN` are overridable from the shell.
+
+Images also publish to GHCR (CPU-only torch, ~4.4GB model build / ~2.1GB slim):
+
+```bash
+docker pull ghcr.io/diwas2055/gatelaya:latest        # model: litellm + Laya
+docker pull ghcr.io/diwas2055/gatelaya:latest-slim    # no torch; guardrail fail-opens or mount GATELAYA_MODEL_PATH
+docker run -p 4000:4000 -e OPENAI_API_KEY=sk-... -e LITELLM_MASTER_KEY=sk-local ghcr.io/diwas2055/gatelaya:latest
+```
+
+Makefile: `make sync` / `make test` / `make lint` / `make run` / `make docker-up`.
 
 ### Local
 
 ```bash
 uv sync                              # base deps + dev group (litellm[proxy], fastapi, sqlalchemy, pytest)
 uv sync --extra model                # adds laya; weights (~800MB) download on first predict
-uv sync --all-extras                 # everything (model, redis, dev)
-uv add asyncpg                       # only if you set GATELAYA_DATABASE_URL (Postgres)
+uv sync --all-extras                 # everything (model, redis, postgres, dev)
+uv sync --extra postgres             # only if you set GATELAYA_DATABASE_URL (Postgres)
 
 uv run pytest                        # 354 passed, 1 skipped
 
@@ -407,9 +417,12 @@ gatelaya/
 ├── README.md                  this file
 ├── LICENSE                    Apache License 2.0
 ├── pyproject.toml             packages: gatelaya, custom_guardrail, custom_guardrail.gatelaya
-│                              extras: [model]=laya, [redis], [dev]=pytest/pytest-asyncio/aiosqlite
-├── Dockerfile                 python:3.12-slim; pip install . + litellm[proxy] + asyncpg
-├── docker-compose.yml         litellm-gatelaya + postgres + redis
+│                              extras: [model]=laya+torch(CPU index), [postgres], [redis], [dev]
+├── Makefile                   make sync/test/lint/run/docker-up
+├── Dockerfile                 multi-stage uv build; targets: model (default, +Laya/torch) and slim
+├── docker-compose.yml         litellm-gatelaya + dashboard + postgres + redis
+├── .github/workflows/ci.yml   ruff + eval smoke + pytest (3.12/3.13)
+├── .github/workflows/docker.yml  GHCR build/push (model + slim) on main/tags
 ├── proxy_config.yaml          LiteLLM proxy config: guardrail registration + env placeholders
 ├── scripts/
 │   └── calibrate.py           fit temperature scaling from labeled JSONL -> calibration.json

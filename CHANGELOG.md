@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.0 (2026-09-25) — release engineering
+
+### CI / community
+- **GitHub Actions** `.github/workflows/ci.yml`: `uv sync --locked`, ruff, eval smoke (`--agent fake`), pytest on Python 3.12 + 3.13
+- **Docker GHCR pipeline** `.github/workflows/docker.yml`: builds `model` + `slim` targets, pushes on `main` and `v*` tags (`ghcr.io/diwas2055/gatelaya:{latest,latest-slim,X.Y.Z-*}`)
+- `CONTRIBUTING.md`, issue templates (bug/feature), PR template with lint/test/eval checklist
+- README badges: CI, release, license, Python
+
+### Packaging / Docker
+- **Multi-stage Dockerfile** (uv): default `model` target (Laya + CPU torch, ~4.4GB) and `slim` target (~2.1GB, fail-open or `GATELAYA_MODEL_PATH`); non-root user, shared deps layer
+- **CPU-only torch** — `pytorch-cpu` index pinned in `uv.lock`: removes ~5GB `nvidia-*`/`triton` from images and CI
+- `postgres` extra (`asyncpg`) for `GATELAYA_DATABASE_URL`; compose gains `dashboard` service (port 8080)
+- **Makefile**: `sync` / `test` / `lint` / `eval` / `run` / `docker-up`
+- Deterministic ruff gate: explicit rule set (`E4,E7,E9,F,W,I,UP`) in `pyproject.toml` (ruff 0.16 expanded defaults)
+- Verified: slim + model images boot, real Laya inference in-container, injection → HTTP 400 `p=1.00`
+
 ## v0.1.0 (2026-09-25) — first release
 
 ### Core

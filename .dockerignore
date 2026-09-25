@@ -1,0 +1,16 @@
+.git
+.github
+.venv
+*.egg-info
+__pycache__
+.pytest_cache
+.ruff_cache
+graphify-out
+evals/models
+evals/results
+evals/reference
+tests
+*.md
+!README.md
+.env
+.env.*

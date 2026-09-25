@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gatelaya"
-version = "0.1.0"
+version = "0.2.0"
 description = "Multilingual LLM guardrail pack: Laya decision model on LiteLLM Proxy"
 requires-python = ">=3.12"
 dependencies = [
@@ -18,7 +18,8 @@ dependencies = [
 
 [project.optional-dependencies]
 redis = ["redis"]
-model = ["laya"]                 # inference; brings torch + safetensors
+postgres = ["asyncpg"]          # GATELAYA_DATABASE_URL=postgresql+asyncpg://...
+model = ["laya", "torch", "safetensors"]   # inference; torch pinned to CPU index (Docker-friendly)
 train = ["laya", "torch", "safetensors"]  # fine-tuning (scripts/finetune.py)
 dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
 
@@ -43,6 +44,16 @@ packages = [
     "dashboard",
     "dashboard.routers",
 ]
+
+[tool.uv.sources]
+# CPU-only torch: no CUDA wheel bloat (~5GB nvidia-* deps) in images/CI.
+# macOS/Linux both install from the cpu index (MPS builds included there).
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.ruff]
 target-version = "py312"
