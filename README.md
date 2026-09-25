@@ -1,5 +1,10 @@
 # GateLaya — Every LLM call, decided.
 
+[![CI](https://github.com/Diwas2055/gatelaya/actions/workflows/ci.yml/badge.svg)](https://github.com/Diwas2055/gatelaya/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Diwas2055/gatelaya)](https://github.com/Diwas2055/gatelaya/releases)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+
 GateLaya is a multilingual LLM firewall that plugs into LiteLLM Proxy as a `CustomGuardrail`. It inspects every request and response with the **Laya** decision model — a 33ms forward pass, Apache 2.0, on-prem, 100+ languages — and blocks prompt injection, PII, toxicity, and secret leakage *before* the call leaves your network and *after* the model answers. Clients keep talking plain OpenAI API; the guardrail decides, redacts, or passes, and writes every decision to an audit log.
 
 ## How it works
