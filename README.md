@@ -17,11 +17,13 @@ GateLaya is a multilingual LLM firewall that plugs into LiteLLM Proxy as a `Cust
                                              ▼
                                     LLM providers (openai, anthropic, ...)
                                              │
-                                             │  post_call hook  (GateLayaGuardrail)
-                                             │    scan response text
-                                             │    secret_leak | toxicity
-                                             │      ├─ block ──► HTTP 400
-                                             │      └─ allow / flag ──► pass
+                                              │  post_call hook  (GateLayaGuardrail)
+                                              │    scan response text (every choice,
+                                              │    content + reasoning_content)
+                                              │    pii | injection | toxicity | secret_leak
+                                              │      ├─ block ──► HTTP 400
+                                              │      ├─ mask  ──► PII spans rewritten in the response
+                                              │      └─ allow / flag ──► pass
                                              ▼
                                           Client
                                              │
@@ -52,7 +54,7 @@ uv sync --extra model                # adds laya; weights (~800MB) download on f
 uv sync --all-extras                 # everything (model, redis, dev)
 uv add asyncpg                       # only if you set GATELAYA_DATABASE_URL (Postgres)
 
-uv run pytest                        # 231 passed, 1 skipped
+uv run pytest                        # 354 passed, 1 skipped
 
 export OPENAI_API_KEY=sk-...
 export LITELLM_MASTER_KEY=sk-gatelaya-local
@@ -121,6 +123,9 @@ Environment overrides are read in `gatelaya/guardrail.py::_env_overrides` and ar
 | `GATELAYA_FAIL_OPEN` | `true` | `true`/`1`/`yes`/`on` → agent failure allows the request and writes an `agent_error` record; `false` → request blocked |
 | `GATELAYA_AUDIT_ENABLED` | `true` | `false` disables writing `DecisionRecord`s |
 | `GATELAYA_CALIBRATION_PATH` | unset | Path to `calibration.json`; unset → temperature 1.0 (raw model probabilities) |
+| `GATELAYA_HOT_RELOAD` | `true` | `false`/`0`/`no`/`off` disables file polling — config edits then need a proxy restart (see [Hot reload](#hot-reload)) |
+| `GATELAYA_RELOAD_INTERVAL` | `1.0` | seconds between mtime polls; `<= 0` also disables polling |
+| `GATELAYA_POLICY_PATH` | unset | Per-key policies YAML (multi-tenancy) — see [Per-key policies](#per-key-policies-multi-tenancy) |
 
 Proxy-level variables consumed by LiteLLM, not by GateLaya: `LITELLM_MASTER_KEY` (from `general_settings.master_key`), `OPENAI_API_KEY` (upstream key for `dummy-openai`), `REDIS_URL`.
 
@@ -153,6 +158,39 @@ fail_open: true
 
 Write one with `GateLayaConfig(...).to_yaml(path)`; read with `GateLayaConfig.from_yaml(path)`.
 
+## Hot reload
+
+The proxy picks up file edits **without a restart** (default on):
+
+| Env var | Default | Description |
+|---|---|---|
+| `GATELAYA_HOT_RELOAD` | `true` | `false` (or the `hot_reload=False` constructor kwarg) disables polling entirely |
+| `GATELAYA_RELOAD_INTERVAL` | `1.0` | seconds between mtime checks; `<= 0` also disables polling |
+
+Watched files: the config YAML (`GATELAYA_CONFIG_PATH`), `calibration_path`, and the policy file (`GATELAYA_POLICY_PATH` or `policy_path:`); the router additionally watches `GATELAYA_ROUTING_PATH`. Changes are detected by mtime on the next hook call, the file is re-read, and the new state is swapped in (GIL-atomic reference assignment — in-flight requests keep the state they started with). A failed read (e.g. a half-written YAML) keeps the previous state and is retried on the next poll. Constructor overrides (`thresholds=` / `actions=`) are re-applied over reloaded YAML, and explicitly pinned collaborators (`event_hook=`, `temperatures=`) are never overwritten. Implementation: `gatelaya/hotreload.py` (`FileWatcher.poll()` detects, `commit()` applies after a successful reload).
+
+## Per-key policies (multi-tenancy)
+
+One proxy, per-key overrides: point `GATELAYA_POLICY_PATH` (or `policy_path` in the config YAML) at a policy file and matched keys run with their own thresholds, actions, `enabled_checks`, `fail_open`, and — for the router — routing overrides.
+
+```yaml
+# /etc/gatelaya/policies.yaml
+policies:
+  - match: {key_alias: team-a}          # every specified field must match (AND)
+    overrides:
+      thresholds: {pii: 0.3}            # dicts merge into the base config
+      actions: {pii: block}
+      enabled_checks: [pii, injection]  # lists/scalars replace
+      fail_open: false
+      routing: {enabled: false}         # router only
+  - match: {api_key_hash: e0af5a5e4f889b9a}   # sha256 hex (or >=12-char prefix)
+    overrides: {thresholds: {secret_leak: 0.6}}
+```
+
+- **Match** — `key_alias` / `user_id` / `team_id` / `api_key_hash`. First matching policy in file order wins; an empty `match` or a plaintext (non-hex) `api_key_hash` is a config error. litellm's already-hashed `api_key` is normalized automatically, so the file never stores plaintext keys.
+- **Resolution** — applied per call on top of the (hot-reloaded) base config. Matched decisions carry `policy` (e.g. `key_alias=team-a`) in `data["gatelaya"]` and in the audit row's `detail`; unmatched keys run global config.
+- Missing or invalid policy file → warning, previous state kept (global at boot).
+
 ## Checks
 
 Questions built in `gatelaya/questions.py`; thresholds/actions from `gatelaya/config.py`. `noul` returns `[P(false), P(true)]`; the check fires when `P(true)` ≥ threshold.
@@ -165,15 +203,15 @@ Questions built in `gatelaya/questions.py`; thresholds/actions from `gatelaya/co
 | `toxicity` | `toxicity` | `noul` | Is this text toxic, hateful, harassing, or sexually explicit? | 0.90 | `block` |
 | `secret_leak` | `secret_leak` | `noul` | Does this text contain secrets such as API keys, passwords, tokens, or private keys? | 0.85 | `block` |
 
-Run order: pre-call `pii → injection → toxicity → secret_leak`; post-call `secret_leak → toxicity`. Only checks in `enabled_checks` run. Scan text = all `system` messages + the last `user` message, joined by newline.
+Run order `pii → injection → toxicity → secret_leak` in both hooks: pre-call scans all `system` messages + the last `user` message (joined by newline); post-call and streaming scan each choice's `content` and `reasoning_content`. Only checks in `enabled_checks` run.
 
 ## Actions
 
 | Action | Semantics |
 |---|---|
 | `allow` | Request/response passes. No decision metadata attached (record still written unless `audit_enabled=false`). |
-| `mask` | **Pre-call only, PII.** Regex spans (SSN, email, credit card, phone) are replaced with `[REDACTED:pii]` in every message; when the model also names a non-`none` `pii_type` *and* the regex matched, the entire last user message collapses to `[REDACTED:pii]`. If the regex matches nothing, or the action fires outside the pre-call PII path (e.g. post-call), it degrades to `flag`. |
-| `block` | Pre-call: hook returns the block string → LiteLLM raises `HTTPException(400)` and no upstream call is made. Post-call: `async_post_call_success_hook` raises `HTTPException(400)`. Both surface as an OpenAI-style error body whose `message` is the block string: pre-call `GateLaya: prompt injection detected (p=0.99)`, post-call `GateLaya: secret leak detected in response (p=0.99)`. |
+| `mask` | **Pre-call (PII).** Regex spans (SSN, email, credit card, phone) are replaced with `[REDACTED:pii]` in every message; when the model also names a non-`none` `pii_type` *and* the regex matched, the entire last user message collapses to `[REDACTED:pii]`. **Post-call / streaming:** the same regex redacts PII spans in each choice's `content` / `reasoning_content` (streaming: buffered deltas are rewritten before delivery). If the regex matches nothing, the action degrades to `flag`. |
+| `block` | Pre-call: hook returns the block string → LiteLLM raises `HTTPException(400)` and no upstream call is made. Post-call: `async_post_call_success_hook` raises `HTTPException(400)`. Streaming: the stream is buffered and scanned at end-of-stream, and a block raises **before any chunk is delivered**. All surface as an OpenAI-style error body whose `message` is the block string: pre-call `GateLaya: prompt injection detected (p=0.99)`, post-call `GateLaya: secret leak detected in response (p=0.99)`. |
 | `flag` | Request passes unchanged. Decision metadata is stashed in `data["gatelaya"]` (and attached to the response as `_hidden_params["gatelaya"]` post-call) and written to the audit sink. This is the audit-only mode for human review. |
 
 One record is written per evaluated check per request — including `allow` outcomes — unless `audit_enabled=false`. Decision rule: `allow` if calibrated `P(true) < threshold`, otherwise the configured action.
@@ -310,7 +348,7 @@ result = asyncio.run(
 
 Signature: `async_pre_call_hook(user_api_key_dict, cache, data, call_type) -> Exception | str | dict | None`.
 
-Passing `config=` explicitly skips the YAML load and `_env_overrides` (`GATELAYA_THRESHOLD_*`, `GATELAYA_ACTION_*`, `GATELAYA_FAIL_OPEN`, `GATELAYA_ENABLED_CHECKS`, `GATELAYA_AUDIT_ENABLED`, `GATELAYA_CALIBRATION_PATH`) — build the config yourself, e.g. `GateLayaConfig.from_yaml(path)`. `GATELAYA_DATABASE_URL` is still honoured for the audit sink. Construction also accepts `config_path=`, `thresholds={...}`, `actions={...}`, `audit_database_url=` kwargs.
+Passing `config=` explicitly skips the YAML load and `_env_overrides` (`GATELAYA_THRESHOLD_*`, `GATELAYA_ACTION_*`, `GATELAYA_FAIL_OPEN`, `GATELAYA_ENABLED_CHECKS`, `GATELAYA_AUDIT_ENABLED`, `GATELAYA_CALIBRATION_PATH`) — build the config yourself, e.g. `GateLayaConfig.from_yaml(path)`. `GATELAYA_DATABASE_URL` is still honoured for the audit sink, and `GATELAYA_POLICY_PATH` is still consulted for per-key policies. Construction also accepts `config_path=`, `thresholds={...}`, `actions={...}`, `audit_database_url=`, `hot_reload=bool` kwargs.
 
 `laya` is imported lazily: the package imports and unit tests run without it; the first prediction raises `LayaNotInstalledError` with `pip install laya` instructions. Under `fail_open=true` that failure becomes an allowed request plus an `agent_error` audit row.
 
@@ -354,7 +392,7 @@ The app creates both tables on boot (SQLite by default; point `GATELAYA_DATABASE
 | GET | `/api/calibration` | temperature map (null when not yet fitted) |
 | POST | `/api/calibration/upload` | multipart JSONL dataset → refit temperatures (503 until `uv sync --extra model`) |
 
-**`restart_required` semantics:** the dashboard only writes files (`gatelaya.yaml`, `calibration.json`) and returns `restart_required: true` — the LiteLLM proxy process loads them at boot. Restart the proxy to apply changes; the dashboard never hot-patches it. Decisions expose `input_sha256` only: raw prompt text never leaves the audit log (operators paste it into review labels for calibration export).
+**`restart_required` semantics:** the dashboard only writes files (`gatelaya.yaml`, `calibration.json`) and reports `restart_required: false` while `GATELAYA_HOT_RELOAD` is on — the proxy re-reads changed files on its next hook call (default polling interval 1s), so no restart is needed. With `GATELAYA_HOT_RELOAD=0` the ack flips to `restart_required: true` and the proxy must be restarted to pick the file up. Decisions expose `input_sha256` only: raw prompt text never leaves the audit log (operators paste it into review labels for calibration export).
 
 ## Architecture
 
@@ -372,7 +410,10 @@ gatelaya/
 │   └── calibrate.py           fit temperature scaling from labeled JSONL -> calibration.json
 ├── gatelaya/                  the library
 │   ├── __init__.py            exports GateLayaGuardrail, GateLayaConfig, LayaAgent
-│   ├── guardrail.py           CustomGuardrail: pre/post hooks, actions, masking, _env_overrides
+│   ├── guardrail.py           CustomGuardrail: pre/post/streaming hooks, actions, masking, hot reload, _env_overrides
+│   ├── hotreload.py           FileWatcher (poll/commit), env_flag/env_interval, build_watcher
+│   ├── policies.py            per-key TenantPolicy/PolicySet, resolve, apply_overrides, reload_policies
+│   ├── routing.py             GateLayaRouter: Laya answers → model choice, routing hot reload
 │   ├── config.py              GateLayaConfig (pydantic), defaults, from_yaml/to_yaml
 │   ├── questions.py           Laya question builders + noul/choice probability normalization
 │   ├── agent.py               LayaAgent protocol, LayaRouterAgent, detect_bucket (ASCII routing)
@@ -382,7 +423,8 @@ gatelaya/
 │   ├── _litellm_stub.py       CustomGuardrail stand-in when litellm is not importable
 │   └── README-module.md       package-level docs (install, hooks, limitations)
 ├── tests/                     pytest: config, questions, calibration, audit, agent,
-│                              pre/post-call hooks, streaming, litellm integration
+│                              pre/post-call hooks, streaming, hot reload, tenant
+│                              policies, phase 4, litellm integration
 └── custom_guardrail/          LiteLLM entry-point package (import path used in proxy_config.yaml)
     └── gatelaya/guardrail.py  re-exports gatelaya.guardrail.GateLayaGuardrail
 ```
@@ -391,15 +433,14 @@ Dependency direction: `custom_guardrail.gatelaya` → `gatelaya.guardrail` → (
 
 ## Limitations (v1)
 
-- **Streaming passes through unenforced.** `async_post_call_streaming_iterator_hook` yields chunks unchanged and logs once; streamed responses are not checked in v1.
+- **Streaming responses are buffered, not incremental.** `async_post_call_streaming_iterator_hook` collects the full stream, scans the assembled text once, then delivers it — a block raises before any chunk reaches the client, but time-to-first-byte equals full generation time.
 - **Masking is regex-assisted.** Only SSN, email, credit-card-shaped, and phone-shaped spans are rewritten. Regex-blind PII (non-Latin names, handles) is not redacted — the request is flagged instead. When the model names a PII type and the regex matched anywhere, the last user message collapses wholesale to `[REDACTED:pii]`.
-- **`mask` on response checks degrades to `flag`** — no secret-redaction patterns exist yet.
+- **`mask` on non-PII checks degrades to `flag`** — redaction patterns are PII-only (SSN, email, card, phone); no secret- or toxicity-redaction patterns exist yet.
 - **No ordinal `score` questions** (position bias in the multilingual checkpoint) — express ordering as `choice`.
 - **`choice` ≤ ~20 options per question.**
 - **Checkpoint routing is ASCII-based**, not language-ID: ASCII-only text → `convaiinnovations/laya`, anything else → `convaiinnovations/laya-multilingual`.
 - **Zero-shot accuracy is near-chance on complex decisions.** Ship narrow checks (binary / few-option) and run calibration — both mandatory, not optional.
 - **`fail_open=true` by default**: an agent/model crash allows the request (audited as `agent_error`). Set `GATELAYA_FAIL_OPEN=false` for fail-closed deployments.
-- **No per-key / per-team thresholds in code** — one config per proxy process.
 - **In-memory audit sink is capped and volatile**; use Postgres for anything you need to keep.
 
 ## Evaluation
@@ -499,7 +540,7 @@ Deploy the fine-tuned checkpoint with `GATELAYA_MODEL_PATH=evals/models/gatelaya
 - **Phase 2 — model routing mode.** Use the same typed-decision layer to pick a model per request instead of only gating it.
 - **Phase 3 — FastAPI dashboard (Alpine.js + Tailwind).** Review queue for `flag` outcomes, threshold tuning UI, calibration upload, decision search over `guardrail_decisions`.
 - **Fine-tuning on production traffic.** ✅ Shipped: `scripts/finetune.py` + held-out splits close the gate (0.908 / 0.086). Next: feed review-queue labels into the next training round alongside `evals/data/`.
-- Later: Celery jobs for low-confidence review, per-key threshold config, streaming enforcement.
+- Later: Celery jobs for low-confidence review. ✅ Shipped (Phase 4): per-key threshold config ([Per-key policies](#per-key-policies-multi-tenancy)) and streaming enforcement (buffered end-of-stream scan) + config/policy hot reload ([Hot reload](#hot-reload)).
 
 ## License
 

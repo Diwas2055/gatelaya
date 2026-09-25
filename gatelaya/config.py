@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -51,6 +52,8 @@ class GateLayaConfig(BaseModel):
         default_factory=lambda: ["pii", "injection", "toxicity", "secret_leak"]
     )
     calibration_path: Path | None = None
+    #: Multi-tenant per-key policies YAML (see gatelaya/policies.py).
+    policy_path: Path | None = None
     audit_enabled: bool = True
     fail_open: bool = True
 
@@ -110,10 +113,12 @@ class GateLayaConfig(BaseModel):
             raise GuardrailConfigurationError(f"invalid config in {p}: {exc}") from exc
 
     def to_yaml(self, path: str | Path) -> None:
-        """Write this configuration to a YAML file."""
+        """Atomically write this configuration to a YAML file (write + rename)."""
         p = Path(path)
         p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(
+        tmp = p.with_name(f"{p.name}.tmp")
+        tmp.write_text(
             yaml.safe_dump(self.model_dump(mode="json"), sort_keys=False),
             encoding="utf-8",
         )
+        os.replace(tmp, p)

@@ -416,7 +416,9 @@ function dashboard() {
           }),
         });
         if (r && r.path) this.configPath = r.path;
-        this.saveBanner = 'Saved to ' + (this.configPath || 'config') + '. Restart LiteLLM proxy to apply.';
+        this.saveBanner = r && r.hot_reload
+          ? 'Saved to ' + (this.configPath || 'config') + ' — proxy hot-reloads automatically (~1s).'
+          : 'Saved to ' + (this.configPath || 'config') + '. Restart LiteLLM proxy to apply.';
         this.toast('Config saved', 'ok');
       } catch (e) {
         if (!this.isAuthError(e)) this.toast('Save failed: ' + e.message);

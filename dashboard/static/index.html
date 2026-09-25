@@ -675,6 +675,10 @@
                     </template>
                   </tbody>
                 </table>
+                <div x-show="uploadResult && uploadResult.hot_reload"
+                     class="flex items-start gap-2 rounded border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
+                  <span>Proxy hot-reloads the new temperatures automatically (~1s).</span>
+                </div>
                 <div x-show="uploadResult && uploadResult.restart_required"
                      class="flex items-start gap-2 rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
                   <span>Restart LiteLLM proxy to apply the new temperatures.</span>

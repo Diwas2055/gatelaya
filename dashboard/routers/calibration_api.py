@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from gatelaya.calibration import TemperatureMap, fit
 from gatelaya.config import ALL_CHECKS
 from gatelaya.errors import GuardrailConfigurationError, LayaNotInstalledError
+from gatelaya.hotreload import env_flag
 from gatelaya.questions import build_questions, choice_probs, noul_probs
 
 from ..dependencies import SettingsDep
@@ -33,12 +34,13 @@ class CalibrationView(BaseModel):
 
 
 class UploadAck(BaseModel):
-    """Fitted temperatures written to disk (proxy reloads at next boot)."""
+    """Fitted temperatures written to disk (hot-reloaded unless disabled)."""
 
     temperatures: dict[str, dict[str, float]]
     n_rows: int
     path: str
     restart_required: bool
+    hot_reload: bool
 
 
 def _parse_rows(content: str, default_check: str | None) -> list[dict[str, Any]]:
@@ -177,9 +179,11 @@ async def upload_calibration(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     temperatures.save(settings.calibration_path)
+    hot_reload = env_flag("GATELAYA_HOT_RELOAD", True)
     return UploadAck(
         temperatures=temperatures.to_dict(),
         n_rows=n_rows,
         path=settings.calibration_path,
-        restart_required=True,
+        restart_required=not hot_reload,
+        hot_reload=hot_reload,
     )

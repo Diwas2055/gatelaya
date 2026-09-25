@@ -74,7 +74,7 @@ async def test_block_stashes_meta_and_audits_post_call() -> None:
     assert "gatelaya" in data
     blocked = next(d for d in data["gatelaya"]["decisions"] if d["check"] == "secret_leak")
     assert blocked["blocked"] is True
-    assert {r.check for r in sink.records} == {"secret_leak", "toxicity"}
+    assert {r.check for r in sink.records} == {"pii", "injection", "toxicity", "secret_leak"}
     for rec in sink.records:
         assert rec.mode == "post_call"
         assert rec.latency_ms >= 0
@@ -261,9 +261,9 @@ async def test_enabled_checks_restriction_honored_on_post() -> None:
 
 
 async def test_disabled_post_checks_skip_agent() -> None:
-    """Arrange: enabled_checks without any post-call check (only 'pii').
-    Act: hook. Assert: agent never called, None returned."""
-    cfg = GateLayaConfig(enabled_checks=["pii"])
+    """Arrange: enabled_checks=[] (no checks at all). Act: hook. Assert: agent
+    never called, None returned — post-call scans every enabled check."""
+    cfg = GateLayaConfig(enabled_checks=[])
     agent = FakeAgent()
     guard = GateLayaGuardrail(config=cfg, agent=agent, audit=InMemoryAuditSink())
     # Act

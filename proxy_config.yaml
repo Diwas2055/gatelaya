@@ -19,6 +19,9 @@
 #   GATELAYA_AUDIT_ENABLED=true      set false to disable the decision audit log
 #   GATELAYA_CONFIG_PATH=/path/to/gatelaya.yaml   optional GateLayaConfig YAML
 #   GATELAYA_CALIBRATION_PATH=/path/to/calibration.json
+#   GATELAYA_HOT_RELOAD=true        watch config/calibration/policy files, swap in ~1s (no restart)
+#   GATELAYA_RELOAD_INTERVAL=1.0    seconds between mtime polls; <=0 disables polling
+#   GATELAYA_POLICY_PATH=/path/to/policies.yaml   multi-tenant per-key policies
 
 model_list:
   - model_name: dummy-openai

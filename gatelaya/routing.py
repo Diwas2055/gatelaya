@@ -20,6 +20,8 @@ from .agent import LayaAgent, LayaRouterAgent, detect_bucket
 from .audit import AuditSink, DecisionRecord, InMemoryAuditSink, SqlAlchemyAuditSink
 from .calibration import TemperatureMap, calibrated, load_temperature_map
 from .errors import GuardrailConfigurationError
+from .hotreload import build_watcher, env_flag, env_interval
+from .policies import PolicySet, RoutingOverrides, reload_policies
 from .questions import (
     COMPLEXITY_OPTIONS,
     TASK_OPTIONS,
@@ -158,6 +160,18 @@ def _env_overrides(policy: RoutingPolicy) -> RoutingPolicy:
     return RoutingPolicy(**data)
 
 
+def apply_routing_overrides(
+    policy: RoutingPolicy, overrides: RoutingOverrides | None
+) -> RoutingPolicy:
+    """Return a new policy with per-tenant routing overrides applied (re-validated)."""
+    if overrides is None:
+        return policy
+    updates = overrides.model_dump(exclude_none=True)
+    if not updates:
+        return policy
+    return RoutingPolicy(**{**policy.model_dump(), **updates})
+
+
 class GateLayaRouter(CustomGuardrail):
     """Pre-call LiteLLM guardrail that routes requests to tier models; never blocks."""
 
@@ -169,10 +183,17 @@ class GateLayaRouter(CustomGuardrail):
         temperatures: TemperatureMap | None = None,
         **kwargs: Any,
     ) -> None:
-        """Build the router; omitted collaborators default to env/lazy deployments."""
+        """Build the router; omitted collaborators default to env/lazy deployments.
+
+        `hot_reload=False` disables mtime polling of routing/calibration/policy
+        files (default: GATELAYA_HOT_RELOAD, on). Interval: GATELAYA_RELOAD_INTERVAL.
+        """
         routing_path = kwargs.pop("routing_path", None) or os.getenv("GATELAYA_ROUTING_PATH")
         audit_url = kwargs.pop("audit_database_url", None) or os.getenv("GATELAYA_DATABASE_URL")
+        hot_reload = kwargs.pop("hot_reload", None)
 
+        self._routing_path = Path(routing_path) if routing_path else None
+        self._policy_explicit = policy is not None
         if policy is None:
             policy = RoutingPolicy.from_yaml(routing_path) if routing_path else RoutingPolicy()
             policy = _env_overrides(policy)
@@ -180,15 +201,18 @@ class GateLayaRouter(CustomGuardrail):
             agent = LayaRouterAgent()
         if audit is None:
             audit = SqlAlchemyAuditSink(audit_url) if audit_url else InMemoryAuditSink()
-        if temperatures is None:
-            calibration_path = os.getenv("GATELAYA_CALIBRATION_PATH")
-            if calibration_path:
-                temperatures = load_temperature_map(calibration_path)
+        calibration_env = os.getenv("GATELAYA_CALIBRATION_PATH")
+        self._calibration_path = Path(calibration_env) if calibration_env else None
+        self._temperatures_explicit = temperatures is not None
+        if temperatures is None and calibration_env:
+            temperatures = load_temperature_map(calibration_env)
 
         self.policy = policy
         self.agent = agent
         self.audit = audit
         self.temperatures = temperatures
+        self.policies: PolicySet | None = None
+        self.policies, _ = reload_policies(self._policy_path(), self.policies)
 
         guardrail_name = kwargs.pop("guardrail_name", None) or "gatelaya-router"
         event_hook = kwargs.pop("event_hook", None) or ["pre_call"]
@@ -200,12 +224,78 @@ class GateLayaRouter(CustomGuardrail):
             **kwargs,
         )
 
+        enabled = env_flag("GATELAYA_HOT_RELOAD", True) if hot_reload is None else hot_reload
+        interval = env_interval("GATELAYA_RELOAD_INTERVAL", 1.0)
+        self._watcher = build_watcher(self._watch_paths(), enabled=enabled, interval=interval)
+
     # ------------------------------------------------------------------ helpers
 
     def _temperature(self, question_type: str, option_count: int | None = None) -> float:
         if self.temperatures is None:
             return 1.0
         return self.temperatures.temperature_for(question_type, option_count)
+
+    # ---------------------------------------------------------------- hot reload
+
+    def _policy_path(self) -> Path | None:
+        """Per-key policy YAML from GATELAYA_POLICY_PATH (unset = no policies)."""
+        path = os.getenv("GATELAYA_POLICY_PATH")
+        return Path(path) if path else None
+
+    def _watch_paths(self) -> list[Path]:
+        """Files whose changes trigger a hot reload (routing, calibration, policies)."""
+        paths: list[Path] = []
+        if not self._policy_explicit and self._routing_path is not None:
+            paths.append(self._routing_path)
+        if not self._temperatures_explicit and self._calibration_path is not None:
+            paths.append(self._calibration_path)
+        policy_path = self._policy_path()
+        if policy_path is not None:
+            paths.append(policy_path)
+        return paths
+
+    def _reload_state(self) -> bool:
+        """Reload routing policy/temperatures/policies; False when any failed."""
+        if not self._policy_explicit:
+            try:
+                if self._routing_path is not None:
+                    self.policy = _env_overrides(RoutingPolicy.from_yaml(self._routing_path))
+                else:
+                    self.policy = _env_overrides(RoutingPolicy())
+            except Exception as exc:
+                logger.warning("GateLaya: routing reload failed, keeping previous: %s", exc)
+                return False
+        ok = True
+        if not self._temperatures_explicit and self._calibration_path is not None:
+            try:
+                self.temperatures = load_temperature_map(self._calibration_path)
+            except Exception as exc:
+                logger.warning("GateLaya: calibration reload failed, keeping previous: %s", exc)
+                ok = False
+        policies, policies_ok = reload_policies(self._policy_path(), self.policies)
+        self.policies = policies
+        return policies_ok and ok
+
+    def _maybe_reload(self) -> None:
+        """Swap routing/temperatures/policies in place when their files change."""
+        watcher = self._watcher
+        if watcher is None:
+            return
+        paths = self._watch_paths()
+        if not watcher.poll(paths):
+            return
+        if self._reload_state():
+            watcher.commit()
+
+    def _resolve_call(self, user_api_key_dict: Any) -> tuple[RoutingPolicy, str | None]:
+        """Hot-reload check + per-key policy; returns (effective policy, audit label)."""
+        self._maybe_reload()
+        if not self.policies:
+            return self.policy, None
+        tenant, label = self.policies.resolve(user_api_key_dict)
+        if tenant is None or tenant.overrides.routing is None:
+            return self.policy, label
+        return apply_routing_overrides(self.policy, tenant.overrides.routing), label
 
     async def _predict(self, text: str) -> tuple[dict[str, Any], float, Exception | None]:
         """Run the agent once for the routing questions; returns (answers, latency, error)."""
@@ -226,8 +316,11 @@ class GateLayaRouter(CustomGuardrail):
             )
         return {}, latency_ms, None
 
-    def _signals(self, answers: dict[str, Any]) -> _Signals:
+    def _signals(
+        self, answers: dict[str, Any], policy: RoutingPolicy | None = None
+    ) -> _Signals:
         """Parse routing answers into calibrated sensitivity/confidence signals."""
+        policy = policy or self.policy
         sensitive_raw = noul_probs(answers["sensitive"])[1] if "sensitive" in answers else 0.0
         sensitive_p = calibrated([1.0 - sensitive_raw, sensitive_raw], self._temperature("noul"))[1]
 
@@ -251,19 +344,22 @@ class GateLayaRouter(CustomGuardrail):
         return _Signals(
             task=task,
             complexity=complexity,
-            sensitive=sensitive_p >= self.policy.sensitive_threshold,
+            sensitive=sensitive_p >= policy.sensitive_threshold,
             sensitive_p=sensitive_p,
             confidence=confidence,
             confidence_raw=confidence_raw,
         )
 
-    def _decide(self, original: str, signals: _Signals) -> tuple[str, RouteReason]:
+    def _decide(
+        self, original: str, signals: _Signals, policy: RoutingPolicy | None = None
+    ) -> tuple[str, RouteReason]:
         """Pick the target model: sensitive > low-confidence > tier lookup."""
-        if signals.sensitive and self.policy.sensitive_model:
-            return self.policy.sensitive_model, "sensitive"
-        if signals.confidence < self.policy.confidence_threshold:
-            return self.policy.default_model or original, "low-confidence"
-        tier_model = self.policy.tiers.get(signals.complexity, "")
+        policy = policy or self.policy
+        if signals.sensitive and policy.sensitive_model:
+            return policy.sensitive_model, "sensitive"
+        if signals.confidence < policy.confidence_threshold:
+            return policy.default_model or original, "low-confidence"
+        tier_model = policy.tiers.get(signals.complexity, "")
         if tier_model:
             return tier_model, "tier"
         return original, "no-tier-match"
@@ -315,7 +411,8 @@ class GateLayaRouter(CustomGuardrail):
         self, user_api_key_dict: Any, cache: Any, data: dict, call_type: str
     ) -> dict | None:
         """Rewrite data['model'] from Laya routing signals; never blocks the request."""
-        if not self.policy.enabled:
+        policy, policy_label = self._resolve_call(user_api_key_dict)
+        if not policy.enabled:
             return None
         scan_text, _ = extract_scan_text(data.get("messages"))
         if not scan_text:
@@ -329,7 +426,7 @@ class GateLayaRouter(CustomGuardrail):
         signals: _Signals | None = None
         if error is None:
             try:
-                signals = self._signals(answers)
+                signals = self._signals(answers, policy)
             except Exception as exc:  # malformed answers must fail open, not crash the proxy
                 error = exc
         if error is not None or signals is None:
@@ -338,7 +435,7 @@ class GateLayaRouter(CustomGuardrail):
                 text_hash=text_hash, latency_ms=latency_ms, data=data,
             )
 
-        chosen, reason = self._decide(original, signals)
+        chosen, reason = self._decide(original, signals, policy)
         decision = RoutingDecision(
             original_model=original,
             chosen_model=chosen,
@@ -350,6 +447,15 @@ class GateLayaRouter(CustomGuardrail):
             reason=reason,
             latency_ms=latency_ms,
         )
+        detail: dict[str, str] = {
+            "task": signals.task,
+            "complexity": signals.complexity,
+            "sensitive": str(signals.sensitive).lower(),
+            "sensitive_p": f"{signals.sensitive_p:.4f}",
+            "reason": reason,
+        }
+        if policy_label:
+            detail["policy"] = policy_label
         data["model"] = chosen
         data["gatelaya_routing"] = decision.model_dump()
         await self._audit_record(
@@ -363,13 +469,7 @@ class GateLayaRouter(CustomGuardrail):
                 input_sha256=text_hash,
                 latency_ms=latency_ms,
                 mode="route",
-                detail={
-                    "task": signals.task,
-                    "complexity": signals.complexity,
-                    "sensitive": str(signals.sensitive).lower(),
-                    "sensitive_p": f"{signals.sensitive_p:.4f}",
-                    "reason": reason,
-                },
+                detail=detail,
             )
         )
         return data

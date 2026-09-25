@@ -427,7 +427,8 @@ async def test_config_get_default_put_writes_file(
     assert resp.status_code == 200
     body = resp.json()
     assert body["ok"] is True
-    assert body["restart_required"] is True
+    assert body["hot_reload"] is True
+    assert body["restart_required"] is False  # GATELAYA_HOT_RELOAD defaults on
     assert body["path"] == str(cfg_path)
     assert cfg_path.exists()
 
@@ -439,6 +440,18 @@ async def test_config_get_default_put_writes_file(
 
     reloaded = GateLayaConfig.from_yaml(cfg_path)
     assert reloaded.threshold("pii") == pytest.approx(0.7)
+
+
+async def test_config_put_reports_restart_when_hot_reload_disabled(
+    client: httpx.AsyncClient, env: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """GATELAYA_HOT_RELOAD=0: PUT still succeeds but flags restart_required."""
+    monkeypatch.setenv("GATELAYA_HOT_RELOAD", "0")
+    resp = await client.put("/api/config", json={"thresholds": {"pii": 0.6}})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["hot_reload"] is False
+    assert body["restart_required"] is True
 
 
 async def test_config_invalid_patch_is_400(

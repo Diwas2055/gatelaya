@@ -1,4 +1,4 @@
-"""Read/write the GateLaya YAML config — files only, proxy reloads at boot."""
+"""Read/write the GateLaya YAML config — the proxy hot-reloads the file on change."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from gatelaya.config import GateLayaConfig
 from gatelaya.errors import GuardrailConfigurationError
+from gatelaya.hotreload import env_flag
 
 from ..dependencies import SettingsDep
 
@@ -37,11 +38,12 @@ class ConfigPatch(BaseModel):
 
 
 class WriteAck(BaseModel):
-    """Write acknowledgement — the proxy re-reads the file at next boot."""
+    """Write acknowledgement — hot reload picks the file up (~1s) unless disabled."""
 
     ok: bool
     path: str
     restart_required: bool
+    hot_reload: bool
 
 
 def load_config(path: Path) -> tuple[GateLayaConfig, bool]:
@@ -81,4 +83,7 @@ async def put_config(patch: ConfigPatch, settings: SettingsDep) -> WriteAck:
     except PydanticValidationError as exc:
         raise HTTPException(status_code=400, detail=f"invalid config patch: {exc}") from exc
     cfg.to_yaml(path)
-    return WriteAck(ok=True, path=str(path), restart_required=True)
+    hot_reload = env_flag("GATELAYA_HOT_RELOAD", True)
+    return WriteAck(
+        ok=True, path=str(path), restart_required=not hot_reload, hot_reload=hot_reload
+    )

@@ -1,4 +1,4 @@
-"""Tests for the streaming hook: pass-through, no enforcement in v1."""
+"""Tests for the streaming hook: buffered end-of-stream scan, clean passthrough."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ async def test_streaming_logs_pass_through_once(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Arrange: logging capture at INFO. Act: two streaming sessions.
-    Assert: documented pass-through notice logged exactly once per guardrail."""
+    Assert: end-of-stream buffering notice logged exactly once per guardrail."""
     guard = GateLayaGuardrail(
         config=GateLayaConfig(), agent=FakeAgent(), audit=InMemoryAuditSink()
     )
@@ -75,7 +75,7 @@ async def test_streaming_logs_pass_through_once(
         await collect_chunks(guard, [{"a": 1}])
         await collect_chunks(guard, [{"b": 2}])
     # Assert
-    notices = [r for r in caplog.records if "streaming responses pass through" in r.getMessage()]
+    notices = [r for r in caplog.records if "buffered and scanned" in r.getMessage()]
     assert len(notices) == 1
 
 
