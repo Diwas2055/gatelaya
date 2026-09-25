@@ -316,6 +316,48 @@ Passing `config=` explicitly skips the YAML load and `_env_overrides` (`GATELAYA
 
 `laya` is imported lazily: the package imports and unit tests run without it; the first prediction raises `LayaNotInstalledError` with `pip install laya` instructions. Under `fail_open=true` that failure becomes an allowed request plus an `agent_error` audit row.
 
+## Dashboard (Phase 3)
+
+FastAPI dashboard API over the same `guardrail_decisions` table the proxy writes (plus the `review_labels` human-review table). Read/search decisions, manage the `flag` review queue, tune thresholds, and refit calibration — all through `/api/*`.
+
+### Run
+
+```bash
+gatelaya-dashboard              # console script (host/port from settings)
+uvicorn dashboard.main:app      # equivalent, default port 8080
+```
+
+The app creates both tables on boot (SQLite by default; point `GATELAYA_DATABASE_URL` at the proxy's database to see live traffic). The frontend is served from `dashboard/static/` at `/`.
+
+### Environment variables
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `GATELAYA_DASHBOARD_PORT` | `8080` | port for `gatelaya-dashboard` |
+| `GATELAYA_DASHBOARD_HOST` | `127.0.0.1` | bind host for `gatelaya-dashboard` |
+| `GATELAYA_DASHBOARD_TOKEN` | unset | if set, every `/api/*` route except `/api/health` requires `Authorization: Bearer <token>`; unset = open (dev mode) |
+| `GATELAYA_DATABASE_URL` | `sqlite+aiosqlite:///./gatelaya_dashboard.db` | async SQLAlchemy URL of the audit/review database (share the proxy's Postgres URL for live data) |
+| `GATELAYA_CONFIG_PATH` | `./gatelaya.yaml` | config file read/written by `/api/config` |
+| `GATELAYA_CALIBRATION_PATH` | `./calibration.json` | temperature map read/written by `/api/calibration` |
+
+### API endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/health` | liveness probe — always open, never needs the token |
+| GET | `/api/stats?hours=24` | windowed counts, avg latency, `by_check` / `by_action` / `by_mode` |
+| GET | `/api/decisions?check=&action=&mode=&sha256=&since=&until=&limit=50&offset=0` | decision search (exact-match filters, ISO-8601 window, newest first, `limit` capped at 200) |
+| GET | `/api/decisions/{id}` | one full decision (404 when unknown) |
+| GET | `/api/review?status=pending\|resolved\|all&limit=&offset=` | flagged-decision queue with labels |
+| POST | `/api/review/{decision_id}/label` | label a flag as `allow`/`block`/`mask` (404 unknown, 409 duplicate) |
+| GET | `/api/review/export.jsonl?since=&until=` | calibration JSONL for labeled flags with `text` (allow→`no`, block/mask→`yes`) |
+| GET | `/api/config` | current config (file or defaults) + path + exists |
+| PUT | `/api/config` | patch thresholds/actions/enabled_checks/fail_open → writes YAML |
+| GET | `/api/calibration` | temperature map (null when not yet fitted) |
+| POST | `/api/calibration/upload` | multipart JSONL dataset → refit temperatures (503 until `pip install laya`) |
+
+**`restart_required` semantics:** the dashboard only writes files (`gatelaya.yaml`, `calibration.json`) and returns `restart_required: true` — the LiteLLM proxy process loads them at boot. Restart the proxy to apply changes; the dashboard never hot-patches it. Decisions expose `input_sha256` only: raw prompt text never leaves the audit log (operators paste it into review labels for calibration export).
+
 ## Architecture
 
 ```

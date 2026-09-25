@@ -10,6 +10,8 @@ requires-python = ">=3.12"
 dependencies = [
     "litellm",
     "fastapi",
+    "uvicorn",
+    "python-multipart",
     "sqlalchemy[asyncio]",
     "pydantic>=2",
 ]
@@ -17,13 +19,18 @@ dependencies = [
 [project.optional-dependencies]
 redis = ["redis"]
 model = ["laya"]
-dev = ["pytest", "pytest-asyncio", "aiosqlite"]
+dev = ["pytest", "pytest-asyncio", "aiosqlite", "httpx"]
+
+[project.scripts]
+gatelaya-dashboard = "dashboard.main:run"
 
 [tool.setuptools]
 packages = [
     "gatelaya",
     "custom_guardrail",
     "custom_guardrail.gatelaya",
+    "dashboard",
+    "dashboard.routers",
 ]
 
 [tool.pytest.ini_options]

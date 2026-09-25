@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="GateLaya — Every LLM call, decided. Admin dashboard for the LiteLLM guardrail gateway.">
+  <title>GateLaya — Every LLM call, decided.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Cpath d='M16 5l9 4v7c0 6-3.8 10.1-9 11-5.2-.9-9-5-9-11V9l9-4z' fill='%238b5cf6'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    html { scrollbar-color: #334155 #020617; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 6px; border: 2px solid #020617; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+
+  <div x-data="dashboard()" x-cloak
+       @keydown.escape.window="drawer = null; gearOpen = false; confirming = null">
+
+    <!-- Toasts (render above everything) -->
+    <div class="pointer-events-none fixed right-4 top-4 z-[60] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2" aria-live="polite">
+      <template x-for="t in toasts" :key="t.id">
+        <div class="pointer-events-auto rounded-lg border px-3 py-2 text-sm shadow-xl"
+             :class="t.type === 'error'
+               ? 'border-rose-700 bg-rose-950/95 text-rose-200'
+               : 'border-emerald-700 bg-emerald-950/95 text-emerald-200'"
+             role="alert">
+          <span x-text="t.message"></span>
+        </div>
+      </template>
+    </div>
+
+    <!-- ============ 401: token prompt ============ -->
+    <div x-show="unauthorized" x-cloak class="flex min-h-screen items-center justify-center px-4">
+      <form @submit.prevent="saveToken()" class="w-full max-w-sm rounded-xl border border-slate-800 bg-slate-900 p-6 shadow-2xl">
+        <div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-violet-500/15 text-violet-400" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+            <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h1 class="text-lg font-semibold text-slate-100">Dashboard token required</h1>
+        <p class="mt-1 text-sm text-slate-400">
+          The backend expects <code class="rounded bg-slate-800 px-1 text-xs text-slate-300">GATELAYA_DASHBOARD_TOKEN</code>.
+          Enter it to unlock the dashboard. Stored only in this browser's localStorage.
+        </p>
+        <label for="token-prompt" class="mt-4 block text-xs font-medium uppercase tracking-wide text-slate-500">Token</label>
+        <input id="token-prompt" x-ref="tokenInput" x-model="tokenDraft" type="password" autocomplete="off"
+               placeholder="Bearer token"
+               class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+        <button type="submit"
+                class="mt-4 w-full rounded-md bg-violet-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+          Save &amp; unlock
+        </button>
+        <p class="mt-3 text-center text-xs text-slate-600">Sent as <code>Authorization: Bearer …</code> on every request.</p>
+      </form>
+    </div>
+
+    <!-- ============ App ============ -->
+    <div x-show="!unauthorized" x-cloak>
+
+      <!-- Header -->
+      <header class="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+        <div class="relative mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-3 px-4">
+          <div class="flex items-baseline gap-2">
+            <span class="text-lg font-semibold tracking-tight text-slate-100">Gate<span class="text-violet-400">Laya</span></span>
+            <span class="hidden items-center gap-1.5 text-xs text-slate-500 sm:flex">
+              <span class="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true"></span>
+              Every LLM call, decided.
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <!-- Live status -->
+            <div class="flex items-center gap-1.5 text-xs" role="status" aria-live="polite">
+              <span class="h-2 w-2 rounded-full"
+                    :class="health === 'ok' ? 'bg-emerald-400' : health === 'down' ? 'bg-rose-500' : 'bg-slate-600'"
+                    aria-hidden="true"></span>
+              <span class="text-slate-400" x-text="health === 'ok' ? 'Live' : health === 'down' ? 'Offline' : 'Checking'"></span>
+            </div>
+
+            <!-- Token gear -->
+            <button type="button" @click="gearOpen = !gearOpen"
+                    class="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    aria-label="Dashboard token settings" :aria-expanded="gearOpen ? 'true' : 'false'">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+
+            <!-- Token popover -->
+            <div x-show="gearOpen" x-cloak
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 @click.outside="gearOpen = false"
+                 class="absolute right-2 top-full z-50 mt-1 w-80 max-w-[calc(100vw-1rem)] rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-2xl">
+              <label for="token-gear" class="block text-xs font-medium uppercase tracking-wide text-slate-500">Dashboard token</label>
+              <input id="token-gear" x-model="tokenDraft" type="password" autocomplete="off" placeholder="GATELAYA_DASHBOARD_TOKEN"
+                     class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+              <div class="mt-3 flex gap-2">
+                <button type="button" @click="saveToken()"
+                        class="flex-1 rounded-md bg-violet-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500">
+                  Save
+                </button>
+                <button type="button" @click="tokenDraft = ''; saveToken()"
+                        class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                  Clear
+                </button>
+              </div>
+              <p class="mt-2 text-xs text-slate-600">Sent as <code>Authorization: Bearer …</code>. Stored in localStorage only — never hardcoded.</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-[1400px] space-y-6 px-4 py-6">
+
+        <!-- ============ Stat cards ============ -->
+        <section aria-label="Traffic summary" class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <template x-for="c in statCards()" :key="c.label">
+            <div class="relative overflow-hidden rounded-lg border border-slate-800 bg-slate-900 p-4 pl-5">
+              <span class="absolute inset-y-0 left-0 w-1" :class="c.bar" aria-hidden="true"></span>
+              <div class="text-2xl font-semibold tabular-nums leading-none text-slate-100"
+                   :class="{ 'animate-pulse': statsLoading && !stats }"
+                   x-text="statsLoading && !stats ? '––' : c.value"></div>
+              <div class="mt-1.5 flex items-baseline justify-between gap-1">
+                <span class="text-xs font-medium text-slate-400" x-text="c.label"></span>
+                <span class="text-[11px] text-slate-600" x-text="c.sub"></span>
+              </div>
+            </div>
+          </template>
+        </section>
+
+        <!-- ============ Tabs ============ -->
+        <nav class="flex flex-wrap items-center gap-1 border-b border-slate-800" role="tablist" aria-label="Dashboard sections">
+          <template x-for="t in [{id:'decisions',label:'Decisions'},{id:'review',label:'Review'},{id:'settings',label:'Settings'},{id:'calibration',label:'Calibration'}]" :key="t.id">
+            <button type="button" role="tab" @click="setTab(t.id)"
+                    :aria-selected="tab === t.id ? 'true' : 'false'"
+                    class="-mb-px border-b-2 px-3 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-violet-500"
+                    :class="tab === t.id
+                      ? 'border-violet-500 text-slate-100'
+                      : 'border-transparent text-slate-500 hover:border-slate-700 hover:text-slate-300'">
+              <span x-text="t.label"></span>
+              <span x-show="t.id === 'review' && pendingCount > 0"
+                    class="ml-1.5 inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-amber-400"
+                    x-text="pendingCount"></span>
+            </button>
+          </template>
+        </nav>
+
+        <!-- ================= DECISIONS ================= -->
+        <section x-show="tab === 'decisions'" role="tabpanel" aria-label="Decisions" class="space-y-4">
+
+          <!-- Filter bar -->
+          <div class="flex flex-wrap items-end gap-3 rounded-lg border border-slate-800 bg-slate-900/60 p-3">
+            <div class="min-w-[130px]">
+              <label for="f-check" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Check</label>
+              <select id="f-check" x-model="filters.check"
+                      class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                <option value="">All</option>
+                <template x-for="c in ['pii','injection','toxicity','secret_leak','routing','routing_error','agent_error']" :key="c">
+                  <option :value="c" x-text="c"></option>
+                </template>
+              </select>
+            </div>
+            <div class="min-w-[120px]">
+              <label for="f-action" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Action</label>
+              <select id="f-action" x-model="filters.action"
+                      class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                <option value="">All</option>
+                <template x-for="a in ['allow','mask','block','flag']" :key="a">
+                  <option :value="a" x-text="a"></option>
+                </template>
+              </select>
+            </div>
+            <div class="min-w-[120px]">
+              <label for="f-mode" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Mode</label>
+              <select id="f-mode" x-model="filters.mode"
+                      class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                <option value="">All</option>
+                <template x-for="m in ['pre_call','post_call','route']" :key="m">
+                  <option :value="m" x-text="m"></option>
+                </template>
+              </select>
+            </div>
+            <div class="min-w-[180px] flex-1">
+              <label for="f-sha" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">SHA-256 prefix</label>
+              <input id="f-sha" type="text" x-model.trim="filters.sha256" placeholder="e.g. a3f9c1…" spellcheck="false"
+                     class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+            </div>
+            <div>
+              <label for="f-since" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Since</label>
+              <input id="f-since" type="datetime-local" x-model="filters.since"
+                     class="mt-1 rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+            </div>
+            <div>
+              <label for="f-until" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Until</label>
+              <input id="f-until" type="datetime-local" x-model="filters.until"
+                     class="mt-1 rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+            </div>
+            <div class="flex gap-2">
+              <button type="button" @click="applyFilters()"
+                      class="rounded-md bg-violet-600 px-3 py-1.5 text-sm font-medium text-white transition hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-950">
+                Apply
+              </button>
+              <button type="button" @click="resetFilters()"
+                      class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-hidden rounded-lg border border-slate-800">
+            <!-- skeleton -->
+            <div x-show="decisionsLoading && !decisionsLoaded" class="space-y-2 p-4" aria-hidden="true">
+              <template x-for="i in 6" :key="'sk'+i">
+                <div class="h-9 animate-pulse rounded bg-slate-800/60"></div>
+              </template>
+            </div>
+
+            <!-- empty -->
+            <div x-show="decisionsLoaded && !decisionsLoading && decisions.length === 0" class="flex flex-col items-center gap-2 px-4 py-14 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-8 w-8 text-slate-600" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path>
+              </svg>
+              <p class="text-sm text-slate-400">No decisions match these filters.</p>
+              <button type="button" @click="resetFilters()" class="text-xs text-violet-400 hover:text-violet-300">Clear filters</button>
+            </div>
+
+            <!-- rows -->
+            <div x-show="decisionsLoaded && decisions.length > 0" class="overflow-x-auto">
+              <table class="w-full min-w-[980px] text-left text-sm">
+                <thead class="bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-500">
+                  <tr>
+                    <th scope="col" class="px-4 py-2.5 font-medium">Time</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Check</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Mode</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Action</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Lang</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Raw → Cal</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">ms</th>
+                    <th scope="col" class="px-3 py-2.5 font-medium">Detail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="d in decisions" :key="d.id">
+                    <tr @click="drawer = d" tabindex="0" @keydown.enter.prevent="drawer = d"
+                        class="cursor-pointer border-t border-slate-800/70 transition hover:bg-slate-800/40 focus:bg-slate-800/60 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-violet-500">
+                      <td class="whitespace-nowrap px-4 py-2.5 text-slate-300">
+                        <span :title="d.timestamp" x-text="relTime(d.timestamp)"></span>
+                      </td>
+                      <td class="whitespace-nowrap px-3 py-2.5">
+                        <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-medium" :class="checkPill(d.check)" x-text="d.check"></span>
+                      </td>
+                      <td class="whitespace-nowrap px-3 py-2.5 text-xs text-slate-500" x-text="d.mode || '—'"></td>
+                      <td class="whitespace-nowrap px-3 py-2.5">
+                        <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold" :class="actionPill(d.action_taken)" x-text="d.action_taken"></span>
+                      </td>
+                      <td class="whitespace-nowrap px-3 py-2.5 text-xs text-slate-500" x-text="d.language || '—'"></td>
+                      <td class="whitespace-nowrap px-3 py-2.5 tabular-nums text-slate-300" x-text="fmtProbs(d.probs)"></td>
+                      <td class="whitespace-nowrap px-3 py-2.5 tabular-nums text-slate-400" x-text="fmtMs(d.latency_ms)"></td>
+                      <td class="px-3 py-2.5">
+                        <div class="flex max-w-[280px] flex-wrap gap-1">
+                          <template x-for="e in detailEntries(d).slice(0, 3)" :key="e[0]">
+                            <span class="max-w-[130px] truncate rounded bg-slate-800 px-1.5 py-0.5 text-[11px] text-slate-400"
+                                  :title="e[0] + ': ' + fmtDetailValue(e[1])"
+                                  x-text="e[0] + ': ' + fmtDetailValue(e[1])"></span>
+                          </template>
+                          <span x-show="detailEntries(d).length === 0" class="text-xs text-slate-600">—</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div x-show="decisionsLoaded && decisionsTotal > 0" class="flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs text-slate-500" x-text="rangeLabel()"></span>
+            <div class="flex gap-2">
+              <button type="button" :disabled="page === 0 || decisionsLoading" @click="page = page - 1; loadDecisions()"
+                      class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                Prev
+              </button>
+              <button type="button" :disabled="(page + 1) * 50 >= decisionsTotal || decisionsLoading"
+                      @click="page = page + 1; loadDecisions()"
+                      class="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-slate-500">
+                Next
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= REVIEW ================= -->
+        <section x-show="tab === 'review'" role="tabpanel" aria-label="Review queue" class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex gap-1" role="tablist" aria-label="Review status">
+              <template x-for="s in [{id:'pending',label:'Pending'},{id:'resolved',label:'Resolved'}]" :key="s.id">
+                <button type="button" @click="reviewTab = s.id; loadReview()"
+                        :aria-selected="reviewTab === s.id ? 'true' : 'false'" role="tab"
+                        class="rounded-md px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        :class="reviewTab === s.id ? 'bg-violet-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200'">
+                  <span x-text="s.label"></span>
+                  <span x-show="s.id === 'pending' && pendingTotal > 0"
+                        class="ml-1.5 inline-flex rounded-full bg-amber-500/20 px-1.5 text-[11px] font-semibold tabular-nums text-amber-300"
+                        x-text="pendingTotal"></span>
+                  <span x-show="s.id === 'resolved' && resolvedTotal > 0"
+                        class="ml-1.5 inline-flex rounded-full bg-emerald-500/20 px-1.5 text-[11px] font-semibold tabular-nums text-emerald-300"
+                        x-text="resolvedTotal"></span>
+                </button>
+              </template>
+            </div>
+            <button type="button" @click="exportJsonl()"
+                    class="inline-flex items-center gap-1.5 rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line>
+              </svg>
+              Export labeled JSONL
+              <span x-show="resolvedTotal > 0" class="text-xs text-slate-500" x-text="resolvedTotal + ' rows'"></span>
+            </button>
+          </div>
+
+          <!-- skeleton -->
+          <div x-show="reviewLoading && !reviewLoaded" class="space-y-3" aria-hidden="true">
+            <template x-for="i in 4" :key="'rsk'+i">
+              <div class="h-28 animate-pulse rounded-lg bg-slate-800/60"></div>
+            </template>
+          </div>
+
+          <!-- empty -->
+          <div x-show="reviewLoaded && !reviewLoading && reviewItems().length === 0"
+               class="flex flex-col items-center gap-2 rounded-lg border border-dashed border-slate-800 px-4 py-14 text-center">
+            <svg x-show="reviewTab === 'pending'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-8 w-8 text-emerald-700" aria-hidden="true">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <svg x-show="reviewTab === 'resolved'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-8 w-8 text-slate-600" aria-hidden="true">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+            </svg>
+            <p class="text-sm text-slate-400"
+               x-text="reviewTab === 'pending' ? 'Queue clear — nothing waiting for review.' : 'No labels yet — resolve a pending flag to see it here.'"></p>
+          </div>
+
+          <!-- cards -->
+          <div x-show="reviewItems().length > 0" class="grid gap-3 lg:grid-cols-2">
+            <template x-for="item in reviewItems()" :key="item.decision.id">
+              <article class="flex flex-col rounded-lg border border-slate-800 bg-slate-900 p-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-medium" :class="checkPill(item.decision.check)" x-text="item.decision.check"></span>
+                    <span class="text-xs text-slate-500" :title="item.decision.timestamp" x-text="relTime(item.decision.timestamp)"></span>
+                    <span class="text-xs text-slate-600" x-text="item.decision.mode || ''"></span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs tabular-nums text-slate-400"
+                          x-text="'p ' + fmtP(item.decision.probs && item.decision.probs.calibrated)"></span>
+                  </div>
+                </div>
+
+                <div class="mt-2 flex items-center gap-1.5">
+                  <code class="truncate font-mono text-xs text-slate-500"
+                        x-text="trunc(item.decision.input_sha256, 20)"
+                        :title="item.decision.input_sha256"></code>
+                  <button type="button" @click="copy(item.decision.input_sha256)"
+                          class="rounded p-1 text-slate-500 transition hover:bg-slate-800 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                          aria-label="Copy SHA-256 hash">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5" aria-hidden="true">
+                      <rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- resolved: label shown -->
+                <div x-show="reviewTab === 'resolved' && item.label" class="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-800 pt-3">
+                  <span class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold" :class="item.label ? actionPill(item.label.label) : ''" x-text="item.label ? item.label.label : ''"></span>
+                  <span class="text-xs text-slate-500" x-text="item.label && item.label.note ? item.label.note : ''"></span>
+                  <span class="text-[11px] text-slate-600" :title="item.label ? item.label.created_at : ''" x-text="item.label ? relTime(item.label.created_at) : ''"></span>
+                </div>
+
+                <!-- pending: actions -->
+                <div x-show="reviewTab === 'pending'" class="mt-3 space-y-3 border-t border-slate-800 pt-3">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" @click="labelDecision(item.decision.id, 'allow')"
+                            class="rounded-md px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
+                            :class="confirming === item.decision.id + '|allow'
+                              ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400'
+                              : 'bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 focus:ring-emerald-500'"
+                            x-text="confirming === item.decision.id + '|allow' ? 'Confirm allow?' : 'Allow'"></button>
+                    <button type="button" @click="labelDecision(item.decision.id, 'block')"
+                            class="rounded-md px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
+                            :class="confirming === item.decision.id + '|block'
+                              ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400'
+                              : 'bg-rose-500/15 text-rose-300 hover:bg-rose-500/25 focus:ring-rose-500'"
+                            x-text="confirming === item.decision.id + '|block' ? 'Confirm block?' : 'Block'"></button>
+                    <button type="button" @click="labelDecision(item.decision.id, 'mask')"
+                            class="rounded-md px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
+                            :class="confirming === item.decision.id + '|mask'
+                              ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400'
+                              : 'bg-violet-500/15 text-violet-300 hover:bg-violet-500/25 focus:ring-violet-500'"
+                            x-text="confirming === item.decision.id + '|mask' ? 'Confirm mask?' : 'Mask'"></button>
+                    <button type="button" @click="toggleContext(item.decision.id)" :aria-expanded="contextOpen[item.decision.id] ? 'true' : 'false'"
+                            class="ml-auto rounded-md px-2 py-1.5 text-xs text-slate-400 transition hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500">
+                      <span x-text="contextOpen[item.decision.id] ? 'Hide context' : '+ Add context'"></span>
+                    </button>
+                  </div>
+
+                  <div x-show="contextOpen[item.decision.id]" x-cloak class="space-y-2">
+                    <div>
+                      <label :for="'ctx-text-' + item.decision.id" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        Original text (optional, for calibration export)
+                      </label>
+                      <textarea :id="'ctx-text-' + item.decision.id" x-model="drafts[item.decision.id].text" rows="3"
+                                placeholder="Paste the scanned input verbatim…"
+                                class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"></textarea>
+                    </div>
+                    <div>
+                      <label :for="'ctx-note-' + item.decision.id" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Note</label>
+                      <input :id="'ctx-note-' + item.decision.id" x-model="drafts[item.decision.id].note" type="text"
+                             placeholder="Why this label…"
+                             class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2.5 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </template>
+          </div>
+        </section>
+
+        <!-- ================= SETTINGS ================= -->
+        <section x-show="tab === 'settings'" role="tabpanel" aria-label="Settings" class="max-w-3xl space-y-5">
+
+          <!-- skeleton -->
+          <div x-show="configLoading" class="space-y-3" aria-hidden="true">
+            <template x-for="i in 4" :key="'csk'+i">
+              <div class="h-24 animate-pulse rounded-lg bg-slate-800/60"></div>
+            </template>
+          </div>
+
+          <div x-show="!configLoading" class="space-y-5">
+            <!-- path -->
+            <div class="rounded-lg border border-slate-800 bg-slate-900/60 px-4 py-3">
+              <div class="flex flex-wrap items-center gap-2 text-sm">
+                <span class="text-xs font-medium uppercase tracking-wide text-slate-500">Config file</span>
+                <code class="font-mono text-xs text-violet-300" x-text="configPath || '—'"></code>
+                <button type="button" x-show="configPath" @click="copy(configPath)"
+                        class="rounded p-1 text-slate-500 transition hover:bg-slate-800 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        aria-label="Copy config path">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5" aria-hidden="true">
+                    <rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                  </svg>
+                </button>
+              </div>
+              <p x-show="!configExists" class="mt-1 text-xs text-slate-600">No config file on disk — built-in defaults are in use.</p>
+            </div>
+
+            <!-- save banner -->
+            <div x-show="saveBanner" x-cloak x-transition
+                 class="flex items-start justify-between gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200" role="status">
+              <span x-text="saveBanner"></span>
+              <button type="button" @click="saveBanner = null" class="shrink-0 rounded p-0.5 text-amber-300 hover:text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400" aria-label="Dismiss banner">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+                  <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- thresholds -->
+            <fieldset class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+              <legend class="px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Thresholds</legend>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <template x-for="k in ['pii','injection','toxicity','secret_leak']" :key="'th'+k">
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <label :for="'th-' + k" class="text-sm font-medium text-slate-200" x-text="k"></label>
+                      <span class="rounded px-1.5 py-0.5 text-xs font-semibold tabular-nums transition"
+                            :class="draftThreshold(k) < 0.7 ? 'bg-amber-500/15 text-amber-400' : 'bg-slate-800 text-slate-300'"
+                            x-text="fmtP(draftThreshold(k))"></span>
+                    </div>
+                    <input type="range" min="0" max="1" step="0.01" :id="'th-' + k"
+                           x-model.number="draft.thresholds[k]"
+                           class="mt-2 w-full accent-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                    <p x-show="draftThreshold(k) < 0.7" class="mt-1 text-[11px] text-amber-400">
+                      Below 0.7 — expect many false positives.
+                    </p>
+                  </div>
+                </template>
+              </div>
+            </fieldset>
+
+            <!-- actions -->
+            <fieldset class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+              <legend class="px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Actions on threshold hit</legend>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <template x-for="k in ['pii','injection','toxicity','secret_leak']" :key="'ac'+k">
+                  <div>
+                    <label :for="'ac-' + k" class="block text-sm font-medium text-slate-200" x-text="k"></label>
+                    <select :id="'ac-' + k" x-model="draft.actions[k]"
+                            class="mt-1 w-full rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                      <template x-for="a in ['allow','mask','block','flag']" :key="'opt'+a">
+                        <option :value="a" x-text="a"></option>
+                      </template>
+                    </select>
+                  </div>
+                </template>
+              </div>
+            </fieldset>
+
+            <!-- enabled checks + fail open -->
+            <div class="grid gap-4 sm:grid-cols-2">
+              <fieldset class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+                <legend class="px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Enabled checks</legend>
+                <div class="space-y-2">
+                  <template x-for="k in ['pii','injection','toxicity','secret_leak']" :key="'en'+k">
+                    <label class="flex cursor-pointer items-center gap-2.5 text-sm text-slate-300">
+                      <input type="checkbox" :value="k" x-model="draft.enabled_checks"
+                             class="h-4 w-4 rounded border-slate-600 bg-slate-950 accent-violet-500 focus:ring-violet-500">
+                      <span x-text="k"></span>
+                    </label>
+                  </template>
+                </div>
+              </fieldset>
+
+              <div class="rounded-lg border p-4 transition"
+                   :class="draft.fail_open ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-800 bg-slate-900'">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-semibold uppercase tracking-wider"
+                        :class="draft.fail_open ? 'text-amber-400' : 'text-slate-400'">fail_open</span>
+                  <button type="button" role="switch" :aria-checked="draft.fail_open ? 'true' : 'false'"
+                          @click="draft.fail_open = !draft.fail_open"
+                          aria-label="Toggle fail_open"
+                          class="relative h-6 w-11 rounded-full transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900"
+                          :class="draft.fail_open ? 'bg-amber-500' : 'bg-slate-700'">
+                    <span class="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
+                          :class="draft.fail_open ? 'left-[22px]' : 'left-0.5'"></span>
+                  </button>
+                </div>
+                <p class="mt-2 text-xs leading-relaxed"
+                   :class="draft.fail_open ? 'text-amber-300/90' : 'text-slate-500'"
+                   x-text="draft.fail_open
+                     ? 'On: guardrail crash lets the request through (audited as agent_error).'
+                     : 'Off: guardrail crash blocks the request (fail-closed).'"></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button type="button" @click="saveConfig()" :disabled="saving"
+                      class="rounded-md bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-950">
+                <span x-text="saving ? 'Saving…' : 'Save config'"></span>
+              </button>
+              <button type="button" @click="loadConfig()" class="text-sm text-slate-500 hover:text-slate-300">Reload</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= CALIBRATION ================= -->
+        <section x-show="tab === 'calibration'" role="tabpanel" aria-label="Calibration" class="max-w-3xl space-y-5">
+
+          <!-- skeleton -->
+          <div x-show="calLoading" class="space-y-3" aria-hidden="true">
+            <template x-for="i in 3" :key="'ksk'+i">
+              <div class="h-20 animate-pulse rounded-lg bg-slate-800/60"></div>
+            </template>
+          </div>
+
+          <div x-show="!calLoading" class="space-y-5">
+            <!-- current temperatures -->
+            <div class="rounded-lg border border-slate-800 bg-slate-900 p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Current temperatures</h2>
+                <span class="font-mono text-[11px] text-slate-600" x-text="cal.path || ''"></span>
+              </div>
+
+              <!-- uncalibrated warning -->
+              <div x-show="!cal.temperatures" class="mt-3 flex items-start gap-2.5 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 h-4 w-4 shrink-0 text-amber-400" aria-hidden="true">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>
+                </svg>
+                <div class="text-sm text-amber-200">
+                  <p class="font-medium">None — raw probabilities (uncalibrated)</p>
+                  <p class="mt-0.5 text-xs text-amber-300/80">Temperature 1.0: over-confident model output. Thresholds are not trustworthy until you fit calibration.</p>
+                </div>
+              </div>
+
+              <!-- buckets table -->
+              <div x-show="cal.temperatures" class="mt-3 overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                  <thead class="text-[11px] uppercase tracking-wider text-slate-600">
+                    <tr>
+                      <th scope="col" class="py-1.5 pr-4 font-medium">Question</th>
+                      <th scope="col" class="py-1.5 pr-4 font-medium">Bucket</th>
+                      <th scope="col" class="py-1.5 font-medium">Temperature</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(r, i) in tempRows()" :key="'t' + i">
+                      <tr class="border-t border-slate-800/70">
+                        <td class="py-2 pr-4 text-slate-300" x-text="r.group"></td>
+                        <td class="py-2 pr-4 font-mono text-xs text-slate-500" x-text="r.bucket"></td>
+                        <td class="py-2 tabular-nums text-slate-200" x-text="fmtT(r.value)"></td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- upload -->
+            <form @submit.prevent="uploadCalibration()" class="rounded-lg border border-slate-800 bg-slate-900 p-4 space-y-3">
+              <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Fit calibration</h2>
+
+              <div class="flex flex-wrap items-end gap-3">
+                <div class="flex-1 min-w-[220px]">
+                  <label for="cal-file" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Labeled JSONL file</label>
+                  <input id="cal-file" type="file" accept=".jsonl,.json,text/plain" @change="uploadFile = $event.target.files[0] || null"
+                         class="mt-1 w-full text-sm text-slate-400 file:mr-3 file:rounded-md file:border-0 file:bg-violet-600 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white hover:file:bg-violet-500 file:cursor-pointer">
+                </div>
+                <div>
+                  <label for="cal-check" class="block text-[11px] font-medium uppercase tracking-wide text-slate-500">Check (optional)</label>
+                  <select id="cal-check" x-model="uploadCheck"
+                          class="mt-1 rounded-md border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm text-slate-200 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500">
+                    <option value="">Rows carry their own</option>
+                    <template x-for="c in ['pii','injection','toxicity','secret_leak']" :key="'kc'+c">
+                      <option :value="c" x-text="c"></option>
+                    </template>
+                  </select>
+                </div>
+                <button type="submit" :disabled="uploading || !uploadFile"
+                        class="rounded-md bg-violet-600 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-slate-900">
+                  <span x-text="uploading ? 'Fitting…' : 'Upload & fit'"></span>
+                </button>
+              </div>
+
+              <!-- upload progress -->
+              <div x-show="uploading" class="h-1.5 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
+                <div class="h-full w-1/3 animate-pulse rounded-full bg-violet-500"></div>
+              </div>
+
+              <!-- upload error -->
+              <div x-show="uploadError" x-cloak x-transition
+                   class="rounded-lg border border-rose-700 bg-rose-950/70 px-4 py-3 text-sm text-rose-200" role="alert">
+                <p x-text="uploadError"></p>
+              </div>
+
+              <!-- upload success -->
+              <div x-show="uploadResult" x-cloak x-transition
+                   class="space-y-3 rounded-lg border border-emerald-700/60 bg-emerald-950/50 px-4 py-3">
+                <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-emerald-200">
+                  <span x-text="'Fitted ' + (uploadResult ? uploadResult.n_rows : 0) + ' rows'"></span>
+                </div>
+                <table x-show="uploadResult && uploadResult.temperatures" class="w-full text-left text-xs">
+                  <thead class="text-[10px] uppercase tracking-wider text-emerald-400/70">
+                    <tr>
+                      <th scope="col" class="py-1 pr-3 font-medium">Question</th>
+                      <th scope="col" class="py-1 pr-3 font-medium">Bucket</th>
+                      <th scope="col" class="py-1 font-medium">T</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template x-for="(r, i) in resultRows()" :key="'ur' + i">
+                      <tr class="border-t border-emerald-800/40">
+                        <td class="py-1.5 pr-3 text-emerald-200" x-text="r.group"></td>
+                        <td class="py-1.5 pr-3 font-mono text-emerald-300/80" x-text="r.bucket"></td>
+                        <td class="py-1.5 tabular-nums text-emerald-100" x-text="fmtT(r.value)"></td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+                <div x-show="uploadResult && uploadResult.restart_required"
+                     class="flex items-start gap-2 rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                  <span>Restart LiteLLM proxy to apply the new temperatures.</span>
+                </div>
+              </div>
+
+              <!-- format reminder -->
+              <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-xs text-slate-500">
+                <p class="font-medium text-slate-400">Input format — one JSON object per line:</p>
+                <pre class="mt-1 overflow-x-auto rounded bg-slate-950 p-2 font-mono text-[11px] leading-relaxed text-slate-500">{"text": "...", "label": "yes", "check": "injection"}</pre>
+                <p class="mt-2">CLI equivalent:</p>
+                <pre class="mt-1 overflow-x-auto rounded bg-slate-950 p-2 font-mono text-[11px] leading-relaxed text-slate-400" x-text="'python scripts/calibrate.py --input ' + (uploadFile ? uploadFile.name : 'labeled.jsonl') + (uploadCheck ? ' --check ' + uploadCheck : '') + ' --output calibration.json'"></pre>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <!-- ============ Drawer ============ -->
+      <div x-show="drawer" x-cloak class="fixed inset-0 z-50" :aria-hidden="drawer ? 'false' : 'true'">
+        <div x-show="drawer" x-transition.opacity class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" @click="drawer = null"></div>
+        <aside x-show="drawer"
+               x-transition:enter="transition ease-out duration-200"
+               x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
+               x-transition:leave="transition ease-in duration-150"
+               x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+               @keydown.escape.window="drawer = null"
+               role="dialog" aria-modal="true" aria-label="Decision detail"
+               class="absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-slate-800 bg-slate-900 shadow-2xl">
+          <div class="flex items-start justify-between gap-3 border-b border-slate-800 px-5 py-4">
+            <div>
+              <h2 class="text-sm font-semibold text-slate-100">Decision detail</h2>
+              <p class="mt-0.5 font-mono text-[11px] text-slate-600" x-text="drawer ? drawer.id : ''"></p>
+            </div>
+            <button type="button" @click="drawer = null"
+                    class="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    aria-label="Close drawer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+                <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div x-show="drawer" class="flex-1 space-y-5 overflow-y-auto px-5 py-4 text-sm">
+            <!-- key facts -->
+            <dl class="grid grid-cols-2 gap-3">
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Time</dt>
+                <dd class="mt-0.5 text-slate-200">
+                  <div x-text="drawer ? fmtClock(drawer.timestamp) : ''"></div>
+                  <div class="font-mono text-[11px] text-slate-600" x-text="drawer ? drawer.timestamp : ''"></div>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Latency</dt>
+                <dd class="mt-0.5 tabular-nums text-slate-200" x-text="drawer ? (drawer.latency_ms != null ? drawer.latency_ms.toFixed(2) + ' ms' : '—') : ''"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Check</dt>
+                <dd class="mt-0.5">
+                  <span x-show="drawer" class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-medium" :class="drawer ? checkPill(drawer.check) : ''" x-text="drawer ? drawer.check : ''"></span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Action</dt>
+                <dd class="mt-0.5">
+                  <span x-show="drawer" class="inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold" :class="drawer ? actionPill(drawer.action_taken) : ''" x-text="drawer ? drawer.action_taken : ''"></span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Mode</dt>
+                <dd class="mt-0.5 text-slate-300" x-text="drawer ? (drawer.mode || '—') : ''"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Language</dt>
+                <dd class="mt-0.5 text-slate-300" x-text="drawer ? (drawer.language || '—') : ''"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Blocked</dt>
+                <dd class="mt-0.5 text-slate-300" x-text="drawer ? (drawer.blocked ? 'yes' : 'no') : ''"></dd>
+              </div>
+              <div>
+                <dt class="text-[11px] uppercase tracking-wide text-slate-600">Masked</dt>
+                <dd class="mt-0.5 text-slate-300" x-text="drawer ? (drawer.masked ? 'yes' : 'no') : ''"></dd>
+              </div>
+            </dl>
+
+            <!-- probabilities -->
+            <div>
+              <h3 class="text-[11px] uppercase tracking-wide text-slate-600">Probabilities</h3>
+              <div class="mt-1.5 grid grid-cols-2 gap-2">
+                <div class="rounded-md border border-slate-800 bg-slate-950 px-3 py-2">
+                  <div class="text-[11px] text-slate-600">raw</div>
+                  <div class="text-lg font-semibold tabular-nums text-slate-200" x-text="drawer ? fmtP(drawer.probs && drawer.probs.raw) : '—'"></div>
+                </div>
+                <div class="rounded-md border border-violet-500/30 bg-violet-500/5 px-3 py-2">
+                  <div class="text-[11px] text-violet-400/80">calibrated</div>
+                  <div class="text-lg font-semibold tabular-nums text-violet-200" x-text="drawer ? fmtP(drawer.probs && drawer.probs.calibrated) : '—'"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- sha256 -->
+            <div>
+              <h3 class="text-[11px] uppercase tracking-wide text-slate-600">Input SHA-256</h3>
+              <div class="mt-1.5 flex items-start gap-2">
+                <code class="flex-1 break-all rounded-md border border-slate-800 bg-slate-950 px-3 py-2 font-mono text-xs leading-relaxed text-slate-400"
+                      x-text="drawer ? drawer.input_sha256 : ''"></code>
+                <button type="button" @click="copy(drawer.input_sha256)"
+                        class="shrink-0 rounded-md border border-slate-700 px-2.5 py-2 text-slate-400 transition hover:bg-slate-800 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        aria-label="Copy SHA-256 hash">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+                    <rect width="14" height="14" x="8" y="8" rx="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- detail dict -->
+            <div>
+              <h3 class="text-[11px] uppercase tracking-wide text-slate-600">Detail</h3>
+              <pre x-show="drawer && detailEntries(drawer).length > 0"
+                   class="mt-1.5 overflow-x-auto rounded-md border border-slate-800 bg-slate-950 p-3 font-mono text-xs leading-relaxed text-slate-400"
+                   x-text="drawer ? JSON.stringify(drawer.detail || {}, null, 2) : ''"></pre>
+              <p x-show="drawer && detailEntries(drawer).length === 0" class="mt-1.5 text-xs text-slate-600">No detail recorded.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+    </div><!-- /app -->
+  </div><!-- /root -->
+
+  <script src="app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
+</body>
+</html>
