@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gatelaya"
+version = "0.1.0"
+description = "Multilingual LLM guardrail pack: Laya decision model on LiteLLM Proxy"
+requires-python = ">=3.12"
+dependencies = [
+    "litellm",
+    "fastapi",
+    "sqlalchemy[asyncio]",
+    "pydantic>=2",
+]
+
+[project.optional-dependencies]
+redis = ["redis"]
+model = ["laya"]
+dev = ["pytest", "pytest-asyncio", "aiosqlite"]
+
+[tool.setuptools]
+packages = [
+    "gatelaya",
+    "custom_guardrail",
+    "custom_guardrail.gatelaya",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

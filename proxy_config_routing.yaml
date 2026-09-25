@@ -1,0 +1,56 @@
+# GateLaya — LiteLLM Proxy configuration with Phase 2 model routing mode
+# Run: litellm --config proxy_config_routing.yaml --port 4000
+#
+# Two guardrails run on every request:
+#   gatelaya        pre_call + post_call  — block/mask/flag PII, injection, toxicity, secrets
+#   gatelaya-router pre_call              — rewrite data["model"] to a tier/sensitive model
+# The router never blocks; it only rewrites the model and writes a `routing` audit row.
+#
+# Env placeholders (set these in the shell or docker-compose `environment:`):
+#   OPENAI_API_KEY               upstream API key for the models below
+#   LITELLM_MASTER_KEY           proxy master key
+#   GATELAYA_DATABASE_URL        audit sink, e.g. postgresql+asyncpg://user:pass@host:5432/gatelaya
+#                                (omit to use the in-memory audit sink; sqlite+aiosqlite also works)
+#   GATELAYA_CALIBRATION_PATH    calibration.json — thresholds/probs meaningless without it
+#   GATELAYA_CONFIG_PATH         optional GateLayaConfig YAML (checks/thresholds/actions)
+#   GATELAYA_AUDIT_ENABLED=true  set false to disable the decision audit log
+#
+# Phase 2 routing overrides (RoutingPolicy, see gatelaya/routing.py):
+#   GATELAYA_ROUTE_ENABLED=true               false = router passes every request through untouched
+#   GATELAYA_ROUTE_DEFAULT=mid-tier           model for low-confidence routing ('' keeps the original)
+#   GATELAYA_ROUTE_SENSITIVE=frontier         model when the request is sensitive ('' = fall through to tier logic)
+#   GATELAYA_ROUTE_SENSITIVE_THRESHOLD=0.85   calibrated P(sensitive) >= this triggers the sensitive model
+#   GATELAYA_ROUTE_CONFIDENCE_THRESHOLD=0.70  routing confidence below this -> default_model / original
+#   GATELAYA_ROUTE_TIERS={"trivial":"cheap-mini","moderate":"mid-tier","hard":"frontier"}
+#                                             JSON map: complexity label -> model_name in model_list;
+#                                             omit a tier to keep the original model for it
+#   GATELAYA_ROUTING_PATH=/path/to/routing.yaml   optional RoutingPolicy YAML (env wins over the file)
+
+model_list:
+  - model_name: cheap-mini
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: mid-tier
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: frontier
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+guardrails:
+  - guardrail_name: gatelaya
+    litellm_params:
+      guardrail: custom_guardrail.gatelaya.guardrail.GateLayaGuardrail
+      mode: [pre_call, post_call]
+      default_on: true
+  - guardrail_name: gatelaya-router
+    litellm_params:
+      guardrail: custom_guardrail.gatelaya.router.GateLayaRouter
+      mode: [pre_call]
+      default_on: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

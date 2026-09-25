@@ -1,0 +1,37 @@
+# GateLaya — LiteLLM Proxy configuration
+# Run: litellm --config proxy_config.yaml --port 4000
+#
+# Env placeholders (set these in the shell or docker-compose `environment:`):
+#   OPENAI_API_KEY               upstream API key for the dummy model
+#   LITELLM_MASTER_KEY           proxy master key
+#   GATELAYA_DATABASE_URL        audit sink, e.g. postgresql+asyncpg://user:pass@host:5432/gatelaya
+#                                (omit to use the in-memory audit sink; sqlite+aiosqlite also works)
+#   GATELAYA_THRESHOLD_PII=0.85
+#   GATELAYA_THRESHOLD_INJECTION=0.90
+#   GATELAYA_THRESHOLD_TOXICITY=0.90
+#   GATELAYA_THRESHOLD_SECRET_LEAK=0.85
+#   GATELAYA_ACTION_PII=mask         one of: allow | mask | block | flag
+#   GATELAYA_ACTION_INJECTION=block
+#   GATELAYA_ACTION_TOXICITY=block
+#   GATELAYA_ACTION_SECRET_LEAK=block
+#   GATELAYA_FAIL_OPEN=true          true = allow on agent failure; false = block
+#   GATELAYA_ENABLED_CHECKS=pii,injection,toxicity,secret_leak
+#   GATELAYA_AUDIT_ENABLED=true      set false to disable the decision audit log
+#   GATELAYA_CONFIG_PATH=/path/to/gatelaya.yaml   optional GateLayaConfig YAML
+#   GATELAYA_CALIBRATION_PATH=/path/to/calibration.json
+
+model_list:
+  - model_name: dummy-openai
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+guardrails:
+  - guardrail_name: gatelaya
+    litellm_params:
+      guardrail: custom_guardrail.gatelaya.guardrail.GateLayaGuardrail
+      mode: [pre_call, post_call]
+      default_on: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY

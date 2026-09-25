@@ -1,0 +1,40 @@
+services:
+  litellm-gatelaya:
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-gatelaya-local}
+      GATELAYA_DATABASE_URL: postgresql+asyncpg://gatelaya:gatelaya@postgres:5432/gatelaya
+      GATELAYA_THRESHOLD_PII: ${GATELAYA_THRESHOLD_PII:-0.85}
+      GATELAYA_THRESHOLD_INJECTION: ${GATELAYA_THRESHOLD_INJECTION:-0.90}
+      GATELAYA_THRESHOLD_TOXICITY: ${GATELAYA_THRESHOLD_TOXICITY:-0.90}
+      GATELAYA_THRESHOLD_SECRET_LEAK: ${GATELAYA_THRESHOLD_SECRET_LEAK:-0.85}
+      GATELAYA_FAIL_OPEN: ${GATELAYA_FAIL_OPEN:-true}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: gatelaya
+      POSTGRES_PASSWORD: gatelaya
+      POSTGRES_DB: gatelaya
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gatelaya"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  pgdata:
